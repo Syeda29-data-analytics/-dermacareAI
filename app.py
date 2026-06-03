@@ -37,7 +37,7 @@ def quiet_stderr():
 with quiet_stderr():
     from tensorflow.keras.models import load_model
 
-model = load_model("model.h5")
+model = load_model("model.h5", compile=False)
 
 BASE_DIR = Path(__file__).resolve().parent
 PROJECT_DIR = BASE_DIR.parent
@@ -393,4 +393,4 @@ def uploaded_file(filename: str):
 if __name__ == "__main__":
     logging.getLogger("werkzeug").disabled = True
     print("DermaCareAI website: http://127.0.0.1:5000", flush=True)
-    app.run(host="0.0.0.0", port=5000, debug=True) edit so i can copy and paste
+    app.run(host="0.0.0.0", port=5000, debug=True)
