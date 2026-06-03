@@ -1,5 +1,5 @@
-flask
-numpy
-opencv-python
-tensorflow
+flask==3.0.0
+numpy==1.24.4
+opencv-python-headless
+tensorflow-cpu==2.15.0
 werkzeug
