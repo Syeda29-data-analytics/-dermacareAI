@@ -1,5 +1,5 @@
-flask==3.0.0
+Flask==3.0.0
+gunicorn
 numpy==1.24.4
-opencv-python-headless
+opencv-python-headless==4.8.1.78
 tensorflow-cpu==2.15.0
-werkzeug
