@@ -7,6 +7,14 @@ import sys
 from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
+import os
+
+BASE_DIR = Path(__file__).resolve().parent
+MODEL_PATH = BASE_DIR / "model.h5"
+import sys
+from contextlib import contextmanager
+from datetime import datetime
+from pathlib import Path
 from typing import Any
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
@@ -37,7 +45,7 @@ def quiet_stderr():
 with quiet_stderr():
     from tensorflow.keras.models import load_model
 
-model = load_model("model.h5", compile=False)
+model = load_model(MODEL_PATH, compile=False)
 
 BASE_DIR = Path(__file__).resolve().parent
 PROJECT_DIR = BASE_DIR.parent
