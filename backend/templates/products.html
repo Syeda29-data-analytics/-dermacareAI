@@ -1,0 +1,7 @@
+﻿{% extends "base.html" %}
+{% block title %}Products - DermaCareAI{% endblock %}
+{% block content %}
+<nav class="nav glass-panel"><div class="container nav-inner"><a href="/"><img class="logo" src="{{ url_for('static', filename='assets/favicon-v2.png') }}" alt="DermaCareAI"></a><a class="btn btn-ghost" href="/dashboard">Back Back</a></div></nav>
+<main class="container page-section"><div class="center"><h1>Recommended Products</h1><p class="subtitle">AI-curated skincare matched to your skin profile.</p></div><div class="grid-products" style="margin-top:32px">{% for product in products %}<article class="glass-panel-elevated product-card"><img src="{{ product.image }}" alt="{{ product.name }}"><div class="product-body"><div><small class="mono muted">{{ product.brand }}</small><h3>{{ product.name }}</h3><p class="muted" style="font-size:13px">{{ product.description }}</p></div><div style="display:flex;justify-content:space-between"><strong class="stat-text">{{ product.price }}</strong><strong class="stat-text" style="color:var(--accent)">{{ product.matchScore }}% match</strong></div><a class="btn btn-primary btn-full" href="{{ product.amazonUrl }}" target="_blank">Buy on Amazon</a></div></article>{% endfor %}</div></main>
+{% endblock %}
+

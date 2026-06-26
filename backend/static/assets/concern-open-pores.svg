@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320">
+  <defs>
+    <radialGradient id="skinB" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#f2ccb1"/>
+      <stop offset="100%" stop-color="#d8a98a"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="320" rx="160" fill="url(#skinB)"/>
+  <g fill="#9f7f6b" opacity="0.8">
+    <circle cx="88" cy="94" r="7"/><circle cx="114" cy="104" r="8"/><circle cx="141" cy="90" r="6"/>
+    <circle cx="171" cy="108" r="7"/><circle cx="201" cy="97" r="8"/><circle cx="228" cy="112" r="6"/>
+    <circle cx="96" cy="138" r="7"/><circle cx="129" cy="148" r="8"/><circle cx="156" cy="136" r="6"/>
+    <circle cx="187" cy="152" r="7"/><circle cx="214" cy="142" r="8"/><circle cx="238" cy="157" r="6"/>
+    <circle cx="90" cy="184" r="8"/><circle cx="121" cy="192" r="7"/><circle cx="149" cy="181" r="8"/>
+    <circle cx="181" cy="197" r="7"/><circle cx="212" cy="188" r="8"/><circle cx="236" cy="204" r="7"/>
+    <circle cx="102" cy="228" r="7"/><circle cx="136" cy="238" r="8"/><circle cx="165" cy="227" r="6"/>
+    <circle cx="194" cy="242" r="8"/><circle cx="225" cy="233" r="7"/>
+  </g>
+</svg>

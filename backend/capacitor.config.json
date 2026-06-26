@@ -1,0 +1,9 @@
+{
+  "appId": "com.dermacareai.app",
+  "appName": "DermaCareAI",
+  "webDir": "www",
+  "server": {
+    "url": "https://dermacare-ai-example.onrender.com",
+    "cleartext": true
+  }
+}

@@ -1,0 +1,6 @@
+﻿{% extends "base.html" %}
+{% block title %}Admin Dashboard - DermaCareAI{% endblock %}
+{% block content %}
+<main class="container page-section"><div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px"><h1>Admin Dashboard</h1><div class="nav-actions"><a class="btn btn-outline" href="/">Home</a><a class="btn btn-primary" href="/admin/logout">Logout</a></div></div><div class="glass-panel table-wrap"><table><thead><tr><th>User Name</th><th>Score</th><th>Disease</th><th>Date</th></tr></thead><tbody>{% if not rows %}<tr><td colspan="4" class="muted">No scans recorded yet.</td></tr>{% endif %}{% for row in rows %}<tr><td>{{ row.userName }}</td><td>{{ row.score }}/10</td><td>{{ row.disease }}</td><td>{{ row.createdAt }}</td></tr>{% endfor %}</tbody></table></div></main>
+{% endblock %}
+

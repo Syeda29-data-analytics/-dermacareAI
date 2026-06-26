@@ -1,0 +1,17 @@
+﻿{% extends "base.html" %}
+{% block title %}Login - DermaCareAI{% endblock %}
+{% block content %}
+<div class="form-shell">
+  <div class="glass-panel-elevated form-card center">
+    <img class="logo" src="{{ url_for('static', filename='assets/favicon-v2.png') }}" alt="DermaCareAI">
+    <h1>Welcome to DermaCareAI</h1>
+    <p class="muted">Enter your name to begin your skin analysis.</p>
+    <form class="form-stack" method="post" style="margin-top:24px;text-align:left">
+      <input class="input" name="name" placeholder="Your name" required autofocus>
+      <button class="btn btn-primary btn-full" type="submit">Continue &rarr;</button>
+    </form>
+    <p class="muted" style="font-size:12px;margin-top:22px">By continuing, you agree that this tool is not a substitute for professional medical advice.</p>
+  </div>
+</div>
+{% endblock %}
+

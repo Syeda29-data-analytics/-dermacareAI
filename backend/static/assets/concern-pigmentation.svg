@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320">
+  <defs>
+    <radialGradient id="skinC" cx="45%" cy="45%" r="70%">
+      <stop offset="0%" stop-color="#e9c9ac"/>
+      <stop offset="100%" stop-color="#cb9a78"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="320" rx="160" fill="url(#skinC)"/>
+  <path d="M74 86c18-12 46-14 69 3 20 15 29 40 23 64-6 24-21 39-44 47-29 10-62 0-78-23-18-27-6-72 30-91z" fill="#9e6f52" opacity="0.75"/>
+  <path d="M186 136c12-10 33-11 49 2 16 12 21 30 14 47-8 19-22 30-41 35-22 6-45-2-56-20-12-19-3-49 18-64z" fill="#81573f" opacity="0.68"/>
+  <ellipse cx="136" cy="236" rx="36" ry="24" fill="#a27155" opacity="0.6"/>
+</svg>

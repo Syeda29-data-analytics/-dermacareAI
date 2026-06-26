@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320">
+  <defs>
+    <radialGradient id="skinE" cx="50%" cy="48%" r="70%">
+      <stop offset="0%" stop-color="#f0ceb7"/>
+      <stop offset="100%" stop-color="#d4a382"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="320" rx="160" fill="url(#skinE)"/>
+  <g fill="none" stroke="#9f6751" stroke-width="8" stroke-linecap="round" opacity="0.72">
+    <path d="M78 96c18 10 31 8 44-6"/>
+    <path d="M142 122c20 8 34 4 46-10"/>
+    <path d="M94 160c22 6 38 2 51-13"/>
+    <path d="M174 174c18 8 31 5 44-8"/>
+    <path d="M122 214c17 7 32 4 45-6"/>
+    <path d="M190 228c16 7 27 4 38-6"/>
+  </g>
+  <g fill="#b77c63" opacity="0.7">
+    <circle cx="104" cy="120" r="7"/><circle cx="166" cy="148" r="7"/>
+    <circle cx="212" cy="190" r="7"/><circle cx="142" cy="230" r="7"/>
+  </g>
+</svg>

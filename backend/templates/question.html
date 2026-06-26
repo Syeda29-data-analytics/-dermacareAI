@@ -1,0 +1,85 @@
+﻿{% extends "base.html" %}
+{% block title %}Skin Assessment - DermaCareAI{% endblock %}
+
+{% block content %}
+<div class="mobile-wrap">
+  <div class="phone">
+
+    <header class="phone-header">
+      <a href="{{ '/dashboard' if not back_step else url_for('analysis', step=back_step) }}">Back</a>
+
+      <div style="display:flex;align-items:center;gap:8px">
+        <img class="logo" style="height:32px"
+             src="{{ url_for('static', filename='assets/favicon-v2.png') }}"
+             alt="DermaCareAI">
+        <strong>Skin Assessment</strong>
+      </div>
+
+      <span></span>
+    </header>
+
+    <main class="phone-main concern-page">
+
+      <div class="stage-row">
+        {% for title in ['Understanding your skin',
+                         'Understanding your skin concern',
+                         'Generate your Regime'] %}
+
+        <div class="stage {{ 'active' if loop.index0 <= stage else '' }}">
+          <div class="stage-bar"></div>
+          <p>{{ title }}</p>
+        </div>
+
+        {% endfor %}
+      </div>
+
+      <h2>{{ title }}</h2>
+      <p class="muted" style="font-size:14px">{{ description }}</p>
+
+      <form method="post">
+        <div class="option-list">
+
+          {% for option in options %}
+          <label class="option-card">
+
+            <img src="{{ url_for('static', filename='assets/' ~ option.image) }}"
+                 alt="{{ option.title }}">
+
+            <span style="flex:1">
+              <strong>{{ option.title }}</strong>
+
+              {% if option.subtitle %}
+              <small class="muted" style="display:block;margin-top:4px">
+                {{ option.subtitle }}
+              </small>
+              {% endif %}
+            </span>
+
+            <input type="radio" name="{{ field }}" value="{{ option.key }}" required>
+          </label>
+          {% endfor %}
+
+        </div>
+
+        <input type="hidden" name="next_step" value="{{ next_step }}">
+
+        <div style="display:flex;gap:8px;margin-top:24px">
+
+          {% if back_step %}
+          <a class="btn btn-outline btn-full"
+             href="{{ url_for('analysis', step=back_step) }}">
+             Back
+          </a>
+          {% endif %}
+
+          <button class="btn btn-primary btn-full" type="submit">
+            Continue →
+          </button>
+
+        </div>
+      </form>
+
+    </main>
+  </div>
+</div>
+{% endblock %}

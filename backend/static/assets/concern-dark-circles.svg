@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320">
+  <defs>
+    <radialGradient id="skinD" cx="50%" cy="45%" r="70%">
+      <stop offset="0%" stop-color="#f1d1bb"/>
+      <stop offset="100%" stop-color="#d3a486"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="320" rx="160" fill="url(#skinD)"/>
+  <ellipse cx="114" cy="132" rx="42" ry="22" fill="#fff"/>
+  <ellipse cx="206" cy="132" rx="42" ry="22" fill="#fff"/>
+  <circle cx="114" cy="132" r="14" fill="#4c362d"/>
+  <circle cx="206" cy="132" r="14" fill="#4c362d"/>
+  <circle cx="114" cy="132" r="6" fill="#15120f"/>
+  <circle cx="206" cy="132" r="6" fill="#15120f"/>
+  <ellipse cx="114" cy="170" rx="44" ry="16" fill="#6f5a74" opacity="0.5"/>
+  <ellipse cx="206" cy="170" rx="44" ry="16" fill="#6f5a74" opacity="0.5"/>
+</svg>

@@ -1,0 +1,22 @@
+﻿{% extends "base.html" %}
+{% block title %}Dashboard - DermaCareAI{% endblock %}
+{% block content %}
+<nav class="nav glass-panel">
+  <div class="container nav-inner">
+    <a href="/"><img class="logo" src="{{ url_for('static', filename='assets/favicon-v2.png') }}" alt="DermaCareAI"></a>
+    <div class="nav-actions"><span class="muted">Hi, {{ user_name }}</span><a class="btn btn-outline" href="/admin/login">Admin</a><a class="btn btn-ghost" href="/logout">Logout</a></div>
+  </div>
+</nav>
+<main class="container page-section" style="max-width:720px">
+  <div class="center" style="margin-bottom:30px"><h1>Skin Analysis</h1><p class="muted">Upload a photo for AI-powered assessment.</p></div>
+  {% with messages = get_flashed_messages() %}{% if messages %}<div class="flash">{{ messages[0] }}</div>{% endif %}{% endwith %}
+  <form class="glass-panel-elevated upload-box dashboard-upload-box" method="post" enctype="multipart/form-data">
+    <div class="upload-logo-badge">
+      <img src="{{ url_for('static', filename='assets/favicon-v2.png') }}" alt="DermaCareAI logo">
+    </div>
+    <div><h3>Ready to Scan</h3><p class="muted">Choose an image from gallery to provide your skin image.</p></div>
+    <input class="input" type="file" name="image" accept="image/*" required>
+    <button class="btn btn-primary" type="submit">Analyze Skin &rarr;</button>
+  </form>
+</main>
+{% endblock %}

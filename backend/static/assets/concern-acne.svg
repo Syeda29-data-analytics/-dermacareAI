@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320">
+  <defs>
+    <radialGradient id="skinA" cx="50%" cy="45%" r="65%">
+      <stop offset="0%" stop-color="#f5d6c3"/>
+      <stop offset="100%" stop-color="#dfb398"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="320" rx="160" fill="url(#skinA)"/>
+  <circle cx="108" cy="112" r="15" fill="#cf6a63"/>
+  <circle cx="142" cy="136" r="13" fill="#d16863"/>
+  <circle cx="180" cy="116" r="14" fill="#c85e58"/>
+  <circle cx="206" cy="154" r="11" fill="#d8756e"/>
+  <circle cx="126" cy="176" r="12" fill="#c95f5a"/>
+  <circle cx="168" cy="186" r="13" fill="#d07269"/>
+  <circle cx="205" cy="198" r="12" fill="#ca665f"/>
+  <circle cx="152" cy="228" r="10" fill="#d07b74"/>
+</svg>

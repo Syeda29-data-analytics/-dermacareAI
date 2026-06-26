@@ -1,0 +1,24 @@
+﻿{% extends "base.html" %}
+{% block title %}Result - DermaCareAI{% endblock %}
+{% block content %}
+<div class="mobile-wrap"><div class="phone">
+  <header class="phone-header"><a href="/dashboard">Back</a><div style="display:flex;align-items:center;gap:8px"><img class="logo" style="height:32px" src="{{ url_for('static', filename='assets/favicon-v2.png') }}" alt="DermaCareAI"><strong>Skin Assessment</strong></div><span></span></header>
+  <main class="phone-main result-page" style="display:grid;gap:16px">
+    <img class="preview-image" src="{{ url_for('uploaded_file', filename=image_name) }}" alt="Uploaded skin image">
+    <div class="result-box">
+      <p class="mono muted" style="font-size:12px;text-transform:uppercase">Skin Score</p>
+      <p class="stat-text" style="font-size:42px;font-weight:700;color:#0f766e;margin:4px 0">{{ score }}/10</p>
+      <p>Disease detected: <strong>{{ profile.diseaseName }}</strong></p>
+      <p class="muted">Concern selected: <strong>{{ profile.title }}</strong></p>
+      <p class="muted" style="font-size:13px">Model observation: <strong>{{ model_label }}</strong></p>
+    </div>
+    <div class="result-box" style="background:white"><h3>Recommendation Description</h3>{% for line in recommendations %}<p class="check-row"> <span>{{ line }}</span></p>{% endfor %}</div>
+    <h3>Products for {{ profile.title }}</h3>
+    {% for product in products %}
+    <div class="result-box" style="background:white"><div style="display:flex;gap:12px"><img src="{{ product.image }}" alt="{{ product.name }}" style="width:80px;height:80px;border-radius:14px;object-fit:cover"><div><small class="muted">{{ product.brand }}</small><strong style="display:block">{{ product.name }}</strong><small class="muted">{{ product.description }}</small><div style="display:flex;justify-content:space-between;gap:12px;margin-top:8px"><strong style="color:#0f766e">{{ product.price }}</strong><a style="color:#0f766e;font-size:12px;font-weight:700" href="{{ product.amazonUrl }}" target="_blank">Buy on Amazon</a></div></div></div></div>
+    {% endfor %}
+    <div style="display:flex;gap:8px"><a class="btn btn-outline btn-full" href="/dashboard">Re-analyze</a><a class="btn btn-primary btn-full" href="/products">View Products</a></div>
+  </main>
+</div></div>
+{% endblock %}
+
