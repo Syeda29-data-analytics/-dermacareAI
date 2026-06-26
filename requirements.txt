@@ -1,5 +1,9 @@
-﻿flask
-numpy
-opencv-python
-tensorflow
+Flask==3.0.0
+numpy==1.26.4
+opencv-python-headless==4.8.1.78
+tensorflow-cpu==2.15.0
 werkzeug
+gunicorn==21.2.0
+protobuf==4.25.3
+setuptools
+wheel
