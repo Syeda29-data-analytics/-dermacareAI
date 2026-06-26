@@ -1,0 +1,135 @@
+[
+  {
+    "id": "hh-20260502193640_acne-face-map-alt-1440x810.webp",
+    "userName": "hh",
+    "score": "7.1",
+    "disease": "Acne Vulgaris",
+    "createdAt": "2026-05-02 19:36:55"
+  },
+  {
+    "id": "kh-20260502195429_acne-face-map-alt-1440x810.webp",
+    "userName": "kh",
+    "score": "6.7",
+    "disease": "Acne Vulgaris",
+    "createdAt": "2026-05-02 19:54:30"
+  },
+  {
+    "id": "ljbn-20260502195605_normal.webp",
+    "userName": "ljbn",
+    "score": "6.7",
+    "disease": "Acne Vulgaris",
+    "createdAt": "2026-05-02 19:56:05"
+  },
+  {
+    "id": "kh-20260502200533_acne-face-map-alt-1440x810.webp",
+    "userName": "kh",
+    "score": "6.4",
+    "disease": "Acne Vulgaris",
+    "createdAt": "2026-05-02 20:05:48"
+  },
+  {
+    "id": "kh-20260502202855_derma_test.png",
+    "userName": "kh",
+    "score": "6.5",
+    "disease": "Hyperpigmentation",
+    "createdAt": "2026-05-02 20:29:09"
+  },
+  {
+    "id": "hui-20260502204210_sensitive.jpeg",
+    "userName": "hui",
+    "score": "6.2",
+    "disease": "Hyperpigmentation",
+    "createdAt": "2026-05-02 20:42:30"
+  },
+  {
+    "id": "ff-20260502204337_acne-face-map-alt-1440x810.webp",
+    "userName": "ff",
+    "score": "5.5",
+    "disease": "Post-Acne Marks",
+    "createdAt": "2026-05-02 20:43:49"
+  },
+  {
+    "id": "kh-20260502211022_acne-face-map-alt-1440x810.webp",
+    "userName": "kh",
+    "score": "5.8",
+    "disease": "Acne Vulgaris",
+    "createdAt": "2026-05-02 21:10:36"
+  },
+  {
+    "id": ";sd-20260502213403_dry.jpg",
+    "userName": ";sd",
+    "score": "7.0",
+    "disease": "Hyperpigmentation",
+    "createdAt": "2026-05-02 21:34:19"
+  },
+  {
+    "id": "h-20260603064609_skin.webp",
+    "userName": "h",
+    "score": "7.4",
+    "disease": "Acne Vulgaris",
+    "createdAt": "2026-06-03 06:46:28"
+  },
+  {
+    "id": "h-20260603065439_skin.webp",
+    "userName": "h",
+    "score": "7.4",
+    "disease": "Acne Vulgaris",
+    "createdAt": "2026-06-03 06:54:55"
+  },
+  {
+    "id": "s-20260603070115_skin_1.jpg",
+    "userName": "s",
+    "score": "6.3",
+    "disease": "Acne Vulgaris",
+    "createdAt": "2026-06-03 07:01:25"
+  },
+  {
+    "id": "h-20260603070234_skin_1.jpg",
+    "userName": "h",
+    "score": "6.3",
+    "disease": "Acne Vulgaris",
+    "createdAt": "2026-06-03 07:02:48"
+  },
+  {
+    "id": "h-20260603070351_skin.webp",
+    "userName": "h",
+    "score": "6.5",
+    "disease": "Hyperpigmentation",
+    "createdAt": "2026-06-03 07:04:01"
+  },
+  {
+    "id": "h-20260603070733_skin_1.jpg",
+    "userName": "h",
+    "score": "7.0",
+    "disease": "Acne Vulgaris",
+    "createdAt": "2026-06-03 07:07:43"
+  },
+  {
+    "id": "h-20260603071235_skin_1.jpg",
+    "userName": "h",
+    "score": "6.3",
+    "disease": "Acne Vulgaris",
+    "createdAt": "2026-06-03 07:12:47"
+  },
+  {
+    "id": "H-20260603071511_33361.jpg",
+    "userName": "H",
+    "score": "7.4",
+    "disease": "Acne Vulgaris",
+    "createdAt": "2026-06-03 07:15:18"
+  },
+  {
+    "id": "h-20260603090840_skin.webp",
+    "userName": "h",
+    "score": "7.4",
+    "disease": "Acne Vulgaris",
+    "createdAt": "2026-06-03 09:08:49"
+  },
+  {
+    "id": "h-20260603093102_skin.webp",
+    "userName": "h",
+    "score": "6.1",
+    "disease": "Acne Vulgaris",
+    "createdAt": "2026-06-03 09:31:11"
+  }
+]
