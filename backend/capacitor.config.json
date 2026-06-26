@@ -3,7 +3,20 @@
   "appName": "DermaCareAI",
   "webDir": "www",
   "server": {
-    "url": "https://dermacare-ai-example.onrender.com",
+    "url": "https://dermacareai-13.onrender.com",
     "cleartext": true
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 3000,
+      "launchAutoHide": true,
+      "backgroundColor": "#f7f9fb",
+      "androidScaleType": "CENTER_CROP",
+      "showSpinner": true,
+      "androidSpinnerStyle": "large",
+      "spinnerColor": "#087f8c",
+      "splashFullScreen": true,
+      "splashImmersive": true
+    }
   }
 }
