@@ -1,8 +1,6 @@
-Flask==3.0.0
-numpy==1.26.4
-opencv-python-headless==4.8.1.78
-tflite-runtime
-gunicorn==21.2.0
-protobuf==4.25.3
-setuptools
-wheel
+Flask
+gunicorn
+numpy
+opencv-python-headless
+tensorflow==2.15.0
+Pillow
