@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 {% block title %}Dashboard - DermaCareAI{% endblock %}
 {% block content %}
 <nav class="nav glass-panel">
@@ -19,4 +19,67 @@
     <button class="btn btn-primary" type="submit">Analyze Skin &rarr;</button>
   </form>
 </main>
+
+<style>
+.loading-dots::after {
+  content: ' .';
+  animation: dots 1.5s steps(5, end) infinite;
+  display: inline-block;
+  width: 12px;
+  text-align: left;
+}
+@keyframes dots {
+  0%, 20% { content: ' .'; }
+  40% { content: ' ..'; }
+  60% { content: ' ...'; }
+  80%, 100% { content: ''; }
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.querySelector('form');
+  const fileInput = document.querySelector('input[type="file"]');
+  const submitBtn = document.querySelector('button[type="submit"]');
+
+  if (!form || !fileInput || !submitBtn) return;
+
+  form.addEventListener('submit', async (e) => {
+    // If already successfully cloned, submit normally
+    if (form.dataset.fileCloned === 'true') {
+      return;
+    }
+
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    e.preventDefault();
+
+    // Visual feedback
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="loading-dots">Preparing image</span>';
+
+    try {
+      // Read the file content into an ArrayBuffer
+      const arrayBuffer = await file.arrayBuffer();
+
+      // Create a fresh File object in memory. This breaks the volatile Android system URI reference.
+      const clonedFile = new File([arrayBuffer], file.name, { type: file.type });
+
+      // Assign the cloned file using DataTransfer API
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(clonedFile);
+      fileInput.files = dataTransfer.files;
+
+      form.dataset.fileCloned = 'true';
+      submitBtn.innerHTML = 'Uploading...';
+      form.submit();
+    } catch (error) {
+      console.error('File cloning failed:', error);
+      // Fallback: submit the original form if anything fails
+      form.dataset.fileCloned = 'true';
+      form.submit();
+    }
+  });
+});
+</script>
 {% endblock %}
