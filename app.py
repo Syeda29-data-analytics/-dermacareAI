@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import json
 import logging
@@ -48,15 +48,15 @@ with quiet_stderr():
 model = load_model(MODEL_PATH, compile=False)
 
 BASE_DIR = Path(__file__).resolve().parent
-PROJECT_DIR = BASE_DIR.parent
-UPLOAD_FOLDER = PROJECT_DIR / "uploads"
-HISTORY_FILE = PROJECT_DIR / "scan_history.json"
+PROJECT_DIR = BASE_DIR
+UPLOAD_FOLDER = BASE_DIR / "uploads"
+HISTORY_FILE = BASE_DIR / "scan_history.json"
 MODEL_PATH = BASE_DIR / "model.h5"
 
 app = Flask(
     __name__,
-    template_folder=str(PROJECT_DIR / "templates"),
-    static_folder=str(PROJECT_DIR / "static"),
+    template_folder=str(BASE_DIR / "backend" / "templates"),
+    static_folder=str(BASE_DIR / "backend" / "static"),
 )
 app.secret_key = "dermacareai-exam-friendly-secret"
 app.config["UPLOAD_FOLDER"] = str(UPLOAD_FOLDER)
