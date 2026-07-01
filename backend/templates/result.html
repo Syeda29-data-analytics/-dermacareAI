@@ -1,24 +1,348 @@
-﻿{% extends "base.html" %}
-{% block title %}Result - DermaCareAI{% endblock %}
+{% extends "base.html" %}
+{% block title %}Analysis Result – DermaCareAI{% endblock %}
 {% block content %}
-<div class="mobile-wrap"><div class="phone">
-  <header class="phone-header"><a href="/dashboard">Back</a><div style="display:flex;align-items:center;gap:8px"><img class="logo" style="height:32px" src="{{ url_for('static', filename='assets/favicon-v2.png') }}" alt="DermaCareAI"><strong>Skin Assessment</strong></div><span></span></header>
-  <main class="phone-main result-page" style="display:grid;gap:16px">
-    <img class="preview-image" src="{{ url_for('uploaded_file', filename=image_name) }}" alt="Uploaded skin image">
-    <div class="result-box">
-      <p class="mono muted" style="font-size:12px;text-transform:uppercase">Skin Score</p>
-      <p class="stat-text" style="font-size:42px;font-weight:700;color:#0f766e;margin:4px 0">{{ score }}/10</p>
-      <p>Disease detected: <strong>{{ profile.diseaseName }}</strong></p>
-      <p class="muted">Concern selected: <strong>{{ profile.title }}</strong></p>
-      <p class="muted" style="font-size:13px">Model observation: <strong>{{ model_label }}</strong></p>
-    </div>
-    <div class="result-box" style="background:white"><h3>Recommendation Description</h3>{% for line in recommendations %}<p class="check-row"> <span>{{ line }}</span></p>{% endfor %}</div>
-    <h3>Products for {{ profile.title }}</h3>
-    {% for product in products %}
-    <div class="result-box" style="background:white"><div style="display:flex;gap:12px"><img src="{{ product.image }}" alt="{{ product.name }}" style="width:80px;height:80px;border-radius:14px;object-fit:cover"><div><small class="muted">{{ product.brand }}</small><strong style="display:block">{{ product.name }}</strong><small class="muted">{{ product.description }}</small><div style="display:flex;justify-content:space-between;gap:12px;margin-top:8px"><strong style="color:#0f766e">{{ product.price }}</strong><a style="color:#0f766e;font-size:12px;font-weight:700" href="{{ product.amazonUrl }}" target="_blank">Buy on Amazon</a></div></div></div></div>
-    {% endfor %}
-    <div style="display:flex;gap:8px"><a class="btn btn-outline btn-full" href="/dashboard">Re-analyze</a><a class="btn btn-primary btn-full" href="/products">View Products</a></div>
-  </main>
-</div></div>
-{% endblock %}
 
+<style>
+/* ── RESULT PAGE PREMIUM STYLES ───────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --teal: #087f8c;
+  --green: #2eb872;
+  --grad: linear-gradient(135deg, #087f8c, #2eb872);
+  --surface: #f7f9fb;
+  --card-bg: rgba(255,255,255,.95);
+  --border: #e2e8f0;
+  --text: #0f172a;
+  --muted: #64748b;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--surface); font-family: 'Space Grotesk', system-ui, sans-serif; color: var(--text); -webkit-font-smoothing: antialiased; }
+
+/* Top bar */
+.rp-topbar {
+  background: rgba(255,255,255,.92);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  position: sticky; top: 0; z-index: 50;
+}
+.rp-topbar-inner {
+  max-width: 720px; margin: 0 auto;
+  height: 60px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.rp-back { display: flex; align-items: center; gap: 6px; color: var(--teal); font-weight: 600; font-size: 14px; text-decoration: none; }
+.rp-back svg { width: 16px; height: 16px; }
+.rp-logo { height: 32px; object-fit: contain; }
+.rp-topbar-title { font-weight: 700; font-size: 15px; color: var(--text); }
+
+/* Page shell */
+.rp-shell { max-width: 720px; margin: 0 auto; padding: 24px 20px 80px; display: grid; gap: 20px; }
+
+/* Scanned image */
+.rp-image-wrap { border-radius: 20px; overflow: hidden; aspect-ratio: 16/9; position: relative; }
+.rp-image-wrap img { width: 100%; height: 100%; object-fit: cover; }
+.rp-image-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(8,12,20,.65) 0%, transparent 55%);
+  display: flex; align-items: flex-end; padding: 20px;
+}
+.rp-image-badge {
+  background: rgba(255,255,255,.15);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: 12px;
+  padding: 8px 14px;
+  color: white;
+  font-size: 13px; font-weight: 600;
+}
+
+/* AI Score card */
+.rp-score-card {
+  background: var(--grad);
+  border-radius: 22px;
+  padding: 28px;
+  color: white;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  align-items: center;
+}
+.rp-score-label { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; opacity: .8; margin-bottom: 6px; }
+.rp-score-value { font-family: 'JetBrains Mono', monospace; font-size: 52px; font-weight: 700; line-height: 1; }
+.rp-score-sub { font-size: 13px; opacity: .8; margin-top: 4px; }
+.rp-confidence-ring { position: relative; width: 100px; height: 100px; flex-shrink: 0; }
+.rp-confidence-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.rp-confidence-ring .track { fill: none; stroke: rgba(255,255,255,.2); stroke-width: 8; }
+.rp-confidence-ring .fill {
+  fill: none; stroke: white; stroke-width: 8;
+  stroke-linecap: round;
+  stroke-dasharray: 251.2;
+  stroke-dashoffset: calc(251.2 - (251.2 * {{ (confidence / 100)|round(2) }}));
+  transition: stroke-dashoffset 1.2s ease;
+}
+.rp-confidence-label {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+}
+.rp-confidence-num { font-size: 18px; font-weight: 700; }
+.rp-confidence-sub { font-size: 10px; opacity: .8; }
+
+/* Section card */
+.rp-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.05);
+}
+.rp-section-heading {
+  font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+}
+.rp-section-heading::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* Detection result */
+.rp-detection-row {
+  display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: center;
+}
+.rp-det-icon {
+  width: 52px; height: 52px; border-radius: 16px;
+  background: linear-gradient(135deg, rgba(8,127,140,.12), rgba(46,184,114,.12));
+  display: grid; place-items: center; font-size: 24px;
+}
+.rp-det-disease { font-size: 18px; font-weight: 700; color: var(--text); }
+.rp-det-sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.rp-det-model {
+  background: rgba(8,127,140,.08); color: var(--teal);
+  border: 1px solid rgba(8,127,140,.18);
+  border-radius: 8px; padding: 6px 12px;
+  font-size: 12px; font-weight: 700;
+  text-align: center; white-space: nowrap;
+}
+.rp-det-model small { display: block; font-size: 10px; font-weight: 500; opacity: .7; margin-bottom: 2px; }
+
+/* Skin profile tags */
+.rp-profile-tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+.rp-tag {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 14px; border-radius: 999px;
+  background: var(--surface); border: 1px solid var(--border);
+  font-size: 13px; font-weight: 600; color: var(--text);
+}
+.rp-tag span { opacity: .5; font-size: 11px; font-weight: 500; }
+
+/* Recommendations */
+.rp-rec-list { display: grid; gap: 12px; }
+.rp-rec-item {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 14px; border-radius: 14px; background: var(--surface);
+  border: 1px solid var(--border);
+}
+.rp-rec-num {
+  width: 26px; height: 26px; border-radius: 8px;
+  background: var(--grad); color: white;
+  font-size: 12px; font-weight: 700;
+  display: grid; place-items: center; flex-shrink: 0; margin-top: 1px;
+}
+.rp-rec-text { font-size: 14px; line-height: 1.6; color: var(--text); }
+
+/* Products */
+.rp-products-grid { display: grid; gap: 14px; }
+.rp-product {
+  display: flex; gap: 14px;
+  padding: 16px; border-radius: 16px;
+  background: var(--surface); border: 1px solid var(--border);
+  transition: all .2s ease;
+}
+.rp-product:hover { border-color: var(--teal); box-shadow: 0 4px 18px rgba(8,127,140,.12); transform: translateY(-1px); }
+.rp-product-img {
+  width: 72px; height: 72px; border-radius: 12px; object-fit: cover; flex-shrink: 0;
+}
+.rp-product-body { flex: 1; min-width: 0; }
+.rp-product-brand { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.rp-product-name { font-size: 14px; font-weight: 700; color: var(--text); margin: 3px 0; line-height: 1.3; }
+.rp-product-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+.rp-product-meta { display: flex; align-items: center; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.rp-product-price { font-size: 14px; font-weight: 700; color: var(--teal); }
+.rp-product-step {
+  background: rgba(8,127,140,.08); color: var(--teal);
+  border-radius: 6px; padding: 2px 8px; font-size: 11px; font-weight: 600;
+}
+.rp-product-ingredient {
+  background: rgba(46,184,114,.08); color: #1a9056;
+  border-radius: 6px; padding: 2px 8px; font-size: 11px; font-weight: 600;
+}
+.rp-buy-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--grad); color: white;
+  padding: 6px 12px; border-radius: 8px;
+  font-size: 12px; font-weight: 700; text-decoration: none;
+  transition: opacity .2s; white-space: nowrap; margin-top: 6px;
+}
+.rp-buy-btn:hover { opacity: .88; }
+.rp-match-badge {
+  display: flex; align-items: center; gap: 3px;
+  font-size: 12px; font-weight: 700;
+  color: #1a9056;
+}
+
+/* Action buttons */
+.rp-actions { display: flex; gap: 12px; }
+.rp-btn {
+  flex: 1; padding: 14px; border-radius: 14px;
+  font: 600 15px 'Space Grotesk', sans-serif;
+  border: none; cursor: pointer; text-align: center; text-decoration: none;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: all .2s ease;
+}
+.rp-btn-outline { background: white; border: 1.5px solid var(--border); color: var(--text); }
+.rp-btn-outline:hover { border-color: var(--teal); color: var(--teal); }
+.rp-btn-primary { background: var(--grad); color: white; }
+.rp-btn-primary:hover { opacity: .9; transform: translateY(-1px); }
+
+@media (max-width: 500px) {
+  .rp-score-value { font-size: 42px; }
+  .rp-confidence-ring { width: 80px; height: 80px; }
+  .rp-confidence-num { font-size: 15px; }
+  .rp-detection-row { grid-template-columns: auto 1fr; }
+  .rp-det-model { grid-column: 1 / -1; width: fit-content; }
+  .rp-actions { flex-direction: column; }
+}
+</style>
+
+<!-- TOP BAR -->
+<header class="rp-topbar">
+  <div class="rp-topbar-inner">
+    <a class="rp-back" href="/dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Back
+    </a>
+    <span class="rp-topbar-title">AI Analysis Result</span>
+    <img class="rp-logo" src="{{ url_for('static', filename='assets/favicon-v2.png') }}" alt="logo">
+  </div>
+</header>
+
+<!-- MAIN CONTENT -->
+<main class="rp-shell">
+
+  <!-- 1. Scanned image -->
+  <div class="rp-image-wrap">
+    <img src="{{ url_for('uploaded_file', filename=image_name) }}" alt="Uploaded skin image">
+    <div class="rp-image-overlay">
+      <div class="rp-image-badge">📸 Scan Complete</div>
+    </div>
+  </div>
+
+  <!-- 2. AI Score + Confidence Ring -->
+  <div class="rp-score-card">
+    <div>
+      <div class="rp-score-label">AI Skin Health Score</div>
+      <div class="rp-score-value">{{ score }}<span style="font-size:22px;opacity:.7">/10</span></div>
+      <div class="rp-score-sub">Based on real AI model confidence</div>
+    </div>
+    <div class="rp-confidence-ring">
+      <svg viewBox="0 0 100 100">
+        <circle class="track" cx="50" cy="50" r="40"/>
+        <circle class="fill" cx="50" cy="50" r="40"/>
+      </svg>
+      <div class="rp-confidence-label">
+        <span class="rp-confidence-num">{{ confidence }}%</span>
+        <span class="rp-confidence-sub">Confidence</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Detection Result -->
+  <div class="rp-card">
+    <div class="rp-section-heading">Detection Result</div>
+    <div class="rp-detection-row">
+      <div class="rp-det-icon">{{ profile.icon }}</div>
+      <div>
+        <div class="rp-det-disease">{{ profile.diseaseName }}</div>
+        <div class="rp-det-sub">{{ profile.description }}</div>
+      </div>
+      <div class="rp-det-model">
+        <small>AI Detected</small>
+        {{ model_label }}
+      </div>
+    </div>
+
+    <!-- Skin Profile Tags -->
+    <div class="rp-profile-tags">
+      <div class="rp-tag">
+        🧬 <span>Skin Type</span> {{ skin_type | capitalize }}
+      </div>
+      <div class="rp-tag">
+        💧 <span>Texture</span> {{ texture | capitalize }}
+      </div>
+      <div class="rp-tag">
+        🎯 <span>Concern</span> {{ profile.title }}
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Personalised Recommendations -->
+  <div class="rp-card">
+    <div class="rp-section-heading">Personalised Recommendations</div>
+    <div class="rp-rec-list">
+      {% for rec in recommendations %}
+      <div class="rp-rec-item">
+        <div class="rp-rec-num">{{ loop.index }}</div>
+        <div class="rp-rec-text">{{ rec }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- 5. Products for this concern -->
+  <div class="rp-card">
+    <div class="rp-section-heading">Recommended Products for {{ profile.title }}</div>
+    <div class="rp-products-grid">
+      {% for product in products %}
+      <div class="rp-product">
+        <img class="rp-product-img" src="{{ product.image }}" alt="{{ product.name }}">
+        <div class="rp-product-body">
+          <div class="rp-product-brand">{{ product.brand }}</div>
+          <div class="rp-product-name">{{ product.name }}</div>
+          <div class="rp-product-desc">{{ product.description }}</div>
+          <div class="rp-product-meta">
+            <span class="rp-product-price">{{ product.price }}</span>
+            {% if product.step %}
+            <span class="rp-product-step">{{ product.step }}</span>
+            {% endif %}
+            {% if product.keyIngredient %}
+            <span class="rp-product-ingredient">✦ {{ product.keyIngredient }}</span>
+            {% endif %}
+          </div>
+          {% if product.howToUse %}
+          <div style="font-size:11px;color:#64748b;margin-top:6px;font-style:italic">
+            💡 {{ product.howToUse }}
+          </div>
+          {% endif %}
+          <div style="display:flex;align-items:center;gap:10px;margin-top:8px">
+            <a class="rp-buy-btn" href="{{ product.amazonUrl }}" target="_blank" rel="noopener">
+              🛒 Buy on Amazon
+            </a>
+            <div class="rp-match-badge">
+              ✦ {{ product.matchScore }}% match
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- 6. Action buttons -->
+  <div class="rp-actions">
+    <a class="rp-btn rp-btn-outline" href="/dashboard">🔄 Re-Analyse</a>
+    <a class="rp-btn rp-btn-primary" href="/products">🛍️ All Products</a>
+  </div>
+
+</main>
+
+{% endblock %}

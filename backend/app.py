@@ -46,144 +46,399 @@ CONCERN_PROFILES: dict[str, dict[str, str]] = {
         "diseaseName": "Acne Vulgaris",
         "description": "A skin condition that occurs when pores get clogged with oil and dead cells.",
         "recommendationDescription": "Use oil-control cleansing, anti-inflammatory actives, and non-comedogenic hydration while keeping your routine simple and consistent.",
+        "icon": "🔴",
     },
     "open_pores": {
         "title": "Open Pores",
         "diseaseName": "Enlarged Pores with Oily Skin Tendency",
         "description": "Visible enlarged pores usually linked with excess sebum and reduced skin elasticity.",
         "recommendationDescription": "Focus on pore-refining ingredients like niacinamide and salicylic acid and maintain daily sun protection.",
+        "icon": "⭕",
     },
     "pigmentation": {
         "title": "Pigmentation",
         "diseaseName": "Hyperpigmentation",
         "description": "Uneven skin tone and dark patches caused by melanin overproduction.",
         "recommendationDescription": "Prioritize brightening ingredients, UV protection, and gentle exfoliation to gradually reduce dark spots.",
+        "icon": "🟤",
     },
     "dark_circles": {
         "title": "Dark Circles",
         "diseaseName": "Periorbital Hyperpigmentation",
         "description": "Darkness under the eyes due to pigmentation, fatigue, or vascular visibility.",
         "recommendationDescription": "Use hydrating eye care, improve sleep hygiene, and include caffeine or vitamin C based products.",
+        "icon": "🌑",
     },
     "acne_marks": {
         "title": "Acne Marks & Scars",
-        "diseaseName": "Post-Acne Marks",
+        "diseaseName": "Post-Acne Marks (PIH)",
         "description": "Residual marks and texture changes after inflammatory acne lesions heal.",
         "recommendationDescription": "Support skin repair with barrier-friendly products, targeted actives, and regular broad-spectrum SPF.",
+        "icon": "⚡",
     },
 }
 
+# ── Products: 5 UNIQUE products per concern (no cross-concern overlap) ──────
 PRODUCTS = [
+    # ── ACNE (5 dedicated products) ──────────────────────────────────────────
     {
-        "id": "1",
+        "id": "a1",
+        "name": "La Roche-Posay Effaclar Duo+",
+        "brand": "La Roche-Posay",
+        "matchScore": 98,
+        "price": "Rs. 1,650",
+        "image": "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=400&h=400&fit=crop",
+        "amazonUrl": "https://www.amazon.in/s?k=La+Roche+Posay+Effaclar+Duo",
+        "description": "Dual-action acne treatment with LHA + Niacinamide. Unclogs pores and prevents new breakouts.",
+        "concerns": ["acne"],
+        "keyIngredient": "LHA + Niacinamide",
+        "howToUse": "Apply a thin layer on cleansed face morning and/or evening.",
+        "step": "Treatment"
+    },
+    {
+        "id": "a2",
         "name": "CeraVe Foaming Facial Cleanser",
         "brand": "CeraVe",
         "matchScore": 97,
         "price": "Rs. 1,335",
-        "image": "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=400&h=400&fit=crop",
-        "amazonUrl": "https://www.amazon.in/s?k=CeraVe+Foaming+Cleanser",
-        "description": "Gentle foaming cleanser for oily and acne-prone skin.",
-        "concerns": ["acne", "open_pores"]
-    },
-    {
-        "id": "2",
-        "name": "Paula's Choice 2% BHA Liquid Exfoliant",
-        "brand": "Paula's Choice",
-        "matchScore": 96,
-        "price": "Rs. 2,672",
         "image": "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=400&h=400&fit=crop",
-        "amazonUrl": "https://www.amazon.in/s?k=Paula%27s+Choice+2%25+BHA",
-        "description": "Salicylic acid exfoliant for clogged pores and bumps.",
-        "concerns": ["acne", "open_pores", "acne_marks"]
+        "amazonUrl": "https://www.amazon.in/s?k=CeraVe+Foaming+Cleanser",
+        "description": "Non-comedogenic foaming cleanser with ceramides. Removes excess oil without stripping skin barrier.",
+        "concerns": ["acne"],
+        "keyIngredient": "Ceramides + Niacinamide",
+        "howToUse": "Massage onto wet face twice daily, rinse thoroughly.",
+        "step": "Cleanser"
     },
     {
-        "id": "3",
-        "name": "Minimalist 10% Niacinamide Serum",
+        "id": "a3",
+        "name": "Minimalist 2% Salicylic Acid Serum",
         "brand": "Minimalist",
-        "matchScore": 94,
-        "price": "Rs. 599",
-        "image": "https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd?w=400&h=400&fit=crop",
-        "amazonUrl": "https://www.amazon.in/s?k=Minimalist+10%25+Niacinamide",
-        "description": "Balances sebum and helps improve visible pores.",
-        "concerns": ["acne", "open_pores", "pigmentation"]
-    },
-    {
-        "id": "4",
-        "name": "The Derma Co 2% Kojic Acid Serum",
-        "brand": "The Derma Co",
         "matchScore": 95,
-        "price": "Rs. 549",
-        "image": "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=400&h=400&fit=crop",
-        "amazonUrl": "https://www.amazon.in/s?k=Kojic+Acid+Serum",
-        "description": "Targets pigmentation and uneven skin tone.",
-        "concerns": ["pigmentation", "dark_circles", "acne_marks"]
+        "price": "Rs. 449",
+        "image": "https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd?w=400&h=400&fit=crop",
+        "amazonUrl": "https://www.amazon.in/s?k=Minimalist+Salicylic+Acid+Serum",
+        "description": "BHA serum that exfoliates inside pores, reduces whiteheads and blackheads effectively.",
+        "concerns": ["acne"],
+        "keyIngredient": "2% Salicylic Acid (BHA)",
+        "howToUse": "Apply 2–3 drops on cleansed skin at night, 3x per week.",
+        "step": "Exfoliant"
     },
     {
-        "id": "5",
-        "name": "La Roche-Posay Anthelios SPF 50",
-        "brand": "La Roche-Posay",
+        "id": "a4",
+        "name": "Neutrogena Oil-Free Acne Moisturizer",
+        "brand": "Neutrogena",
         "matchScore": 93,
-        "price": "Rs. 1,899",
-        "image": "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&h=400&fit=crop",
-        "amazonUrl": "https://www.amazon.in/s?k=La+Roche+Posay+SPF+50",
-        "description": "Broad-spectrum sunscreen to prevent worsening pigmentation.",
-        "concerns": ["acne", "open_pores", "pigmentation", "dark_circles", "acne_marks"]
+        "price": "Rs. 799",
+        "image": "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400&h=400&fit=crop",
+        "amazonUrl": "https://www.amazon.in/s?k=Neutrogena+Oil+Free+Acne+Moisturizer",
+        "description": "Oil-free moisturizer with salicylic acid. Hydrates without clogging pores.",
+        "concerns": ["acne"],
+        "keyIngredient": "0.5% Salicylic Acid",
+        "howToUse": "Apply daily after cleansing as your moisturizer step.",
+        "step": "Moisturizer"
     },
     {
-        "id": "6",
-        "name": "Mamaearth Under Eye Cream",
-        "brand": "Mamaearth",
+        "id": "a5",
+        "name": "Acne.org Benzoyl Peroxide 2.5%",
+        "brand": "Acne.org",
         "matchScore": 91,
-        "price": "Rs. 399",
-        "image": "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400&h=400&fit=crop",
-        "amazonUrl": "https://www.amazon.in/s?k=under+eye+cream",
-        "description": "Eye cream with caffeine and peptides for tired under-eyes.",
-        "concerns": ["dark_circles"]
-    },
-    {
-        "id": "7",
-        "name": "The Ordinary Caffeine Solution 5%",
-        "brand": "The Ordinary",
-        "matchScore": 90,
-        "price": "Rs. 950",
+        "price": "Rs. 1,100",
         "image": "https://images.unsplash.com/photo-1608248597279-f99d160bfcbc?w=400&h=400&fit=crop",
-        "amazonUrl": "https://www.amazon.in/s?k=The+Ordinary+Caffeine+Solution",
-        "description": "Lightweight serum for puffiness and dark under-eye tone.",
-        "concerns": ["dark_circles"]
+        "amazonUrl": "https://www.amazon.in/s?k=Benzoyl+Peroxide+acne+treatment",
+        "description": "Kills acne-causing bacteria directly. Spot treatment for active pimples and cysts.",
+        "concerns": ["acne"],
+        "keyIngredient": "2.5% Benzoyl Peroxide",
+        "howToUse": "Apply a small amount only on active breakouts at night.",
+        "step": "Spot Treatment"
     },
+
+    # ── OPEN PORES (5 dedicated products) ────────────────────────────────────
     {
-        "id": "8",
+        "id": "p1",
         "name": "Bioderma Sebium Pore Refiner",
         "brand": "Bioderma",
-        "matchScore": 89,
+        "matchScore": 97,
         "price": "Rs. 1,499",
-        "image": "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400&h=400&fit=crop",
-        "amazonUrl": "https://www.amazon.in/s?k=Bioderma+Sebium",
-        "description": "Mattifies skin and helps blur enlarged pores.",
-        "concerns": ["open_pores", "acne"]
+        "image": "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=400&h=400&fit=crop",
+        "amazonUrl": "https://www.amazon.in/s?k=Bioderma+Sebium+Pore+Refiner",
+        "description": "Minimises pore appearance, mattifies and blurs enlarged pores with Zinc & Fluidactiv.",
+        "concerns": ["open_pores"],
+        "keyIngredient": "Zinc PCA + Fluidactiv",
+        "howToUse": "Apply morning after serum, before sunscreen.",
+        "step": "Treatment"
     },
     {
-        "id": "9",
+        "id": "p2",
+        "name": "The Ordinary Niacinamide 10% + Zinc 1%",
+        "brand": "The Ordinary",
+        "matchScore": 96,
+        "price": "Rs. 590",
+        "image": "https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?w=400&h=400&fit=crop",
+        "amazonUrl": "https://www.amazon.in/s?k=The+Ordinary+Niacinamide+Zinc",
+        "description": "Controls sebum, reduces pore visibility and blemishes. Clinical-grade concentration.",
+        "concerns": ["open_pores"],
+        "keyIngredient": "10% Niacinamide + 1% Zinc PCA",
+        "howToUse": "Apply 2–3 drops twice daily to full face before moisturizer.",
+        "step": "Serum"
+    },
+    {
+        "id": "p3",
+        "name": "Plum Green Tea Pore Cleansing Face Wash",
+        "brand": "Plum",
+        "matchScore": 93,
+        "price": "Rs. 299",
+        "image": "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400&h=400&fit=crop",
+        "amazonUrl": "https://www.amazon.in/s?k=Plum+Green+Tea+Face+Wash",
+        "description": "Green tea antioxidants with glycolic acid to deep-cleanse pores and control oil.",
+        "concerns": ["open_pores"],
+        "keyIngredient": "Green Tea Extract + Glycolic Acid",
+        "howToUse": "Use morning and evening as your cleanser.",
+        "step": "Cleanser"
+    },
+    {
+        "id": "p4",
+        "name": "Innisfree No-Sebum Mineral Powder",
+        "brand": "Innisfree",
+        "matchScore": 90,
+        "price": "Rs. 750",
+        "image": "https://images.unsplash.com/photo-1573575155376-b5010099301c?w=400&h=400&fit=crop",
+        "amazonUrl": "https://www.amazon.in/s?k=Innisfree+No+Sebum+Powder",
+        "description": "Volcanic ash powder that absorbs excess sebum and blurs pores for matte finish.",
+        "concerns": ["open_pores"],
+        "keyIngredient": "Jeju Volcanic Ash",
+        "howToUse": "Dust lightly over T-zone after moisturizer to set and mattify.",
+        "step": "Finishing"
+    },
+    {
+        "id": "p5",
+        "name": "Neutrogena Pore Refining Toner",
+        "brand": "Neutrogena",
+        "matchScore": 88,
+        "price": "Rs. 950",
+        "image": "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&h=400&fit=crop",
+        "amazonUrl": "https://www.amazon.in/s?k=Neutrogena+Pore+Refining+Toner",
+        "description": "Alpha and beta hydroxy acids exfoliate and tighten pores while restoring skin's pH.",
+        "concerns": ["open_pores"],
+        "keyIngredient": "AHA + BHA Blend",
+        "howToUse": "Apply with cotton pad after cleansing, avoid eye area.",
+        "step": "Toner"
+    },
+
+    # ── PIGMENTATION (5 dedicated products) ──────────────────────────────────
+    {
+        "id": "g1",
+        "name": "The Derma Co 2% Kojic Acid Serum",
+        "brand": "The Derma Co",
+        "matchScore": 98,
+        "price": "Rs. 549",
+        "image": "https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd?w=400&h=400&fit=crop",
+        "amazonUrl": "https://www.amazon.in/s?k=Derma+Co+Kojic+Acid+Serum",
+        "description": "Inhibits tyrosinase enzyme to fade dark spots and uneven tone at the source.",
+        "concerns": ["pigmentation"],
+        "keyIngredient": "2% Kojic Acid",
+        "howToUse": "Apply 4–5 drops at night on cleansed skin. Use SPF next morning.",
+        "step": "Serum (Night)"
+    },
+    {
+        "id": "g2",
+        "name": "Minimalist Alpha Arbutin 2% + HA",
+        "brand": "Minimalist",
+        "matchScore": 96,
+        "price": "Rs. 399",
+        "image": "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=400&h=400&fit=crop",
+        "amazonUrl": "https://www.amazon.in/s?k=Minimalist+Alpha+Arbutin",
+        "description": "Slowly releases hydroquinone to reduce melanin. Safe, gentle and highly effective.",
+        "concerns": ["pigmentation"],
+        "keyIngredient": "2% Alpha Arbutin + Hyaluronic Acid",
+        "howToUse": "Apply a few drops twice daily before moisturizer.",
+        "step": "Serum"
+    },
+    {
+        "id": "g3",
+        "name": "Neutrogena Rapid Tone Repair Vitamin C Serum",
+        "brand": "Neutrogena",
+        "matchScore": 94,
+        "price": "Rs. 1,299",
+        "image": "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=400&h=400&fit=crop",
+        "amazonUrl": "https://www.amazon.in/s?k=Neutrogena+Vitamin+C+Serum",
+        "description": "Stabilised Vitamin C brightens, evens tone and shields against free radical damage.",
+        "concerns": ["pigmentation"],
+        "keyIngredient": "Vitamin C (Ascorbic Acid)",
+        "howToUse": "Apply 3–4 drops every morning before SPF.",
+        "step": "Serum (AM)"
+    },
+    {
+        "id": "g4",
+        "name": "La Roche-Posay Anthelios SPF 50+",
+        "brand": "La Roche-Posay",
+        "matchScore": 92,
+        "price": "Rs. 1,899",
+        "image": "https://images.unsplash.com/photo-1608248597279-f99d160bfcbc?w=400&h=400&fit=crop",
+        "amazonUrl": "https://www.amazon.in/s?k=La+Roche+Posay+Anthelios+SPF+50",
+        "description": "Broad-spectrum UVA/UVB protection. Daily SPF is essential to prevent worsening pigmentation.",
+        "concerns": ["pigmentation"],
+        "keyIngredient": "Mexoryl SX + XL Filters",
+        "howToUse": "Apply generously as the last morning step. Reapply every 2 hours outdoors.",
+        "step": "Sunscreen"
+    },
+    {
+        "id": "g5",
+        "name": "Mamaearth Bye Bye Dark Spots Face Serum",
+        "brand": "Mamaearth",
+        "matchScore": 89,
+        "price": "Rs. 549",
+        "image": "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400&h=400&fit=crop",
+        "amazonUrl": "https://www.amazon.in/s?k=Mamaearth+Dark+Spots+Serum",
+        "description": "Daisy flower extract and Vitamin C work together to reduce dark spots and boost radiance.",
+        "concerns": ["pigmentation"],
+        "keyIngredient": "Daisy Extract + Vitamin C",
+        "howToUse": "Apply 2–4 drops on face twice daily after cleansing.",
+        "step": "Serum"
+    },
+
+    # ── DARK CIRCLES (5 dedicated products) ──────────────────────────────────
+    {
+        "id": "d1",
+        "name": "Mamaearth Bye Bye Dark Circles Eye Cream",
+        "brand": "Mamaearth",
+        "matchScore": 97,
+        "price": "Rs. 399",
+        "image": "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400&h=400&fit=crop",
+        "amazonUrl": "https://www.amazon.in/s?k=Mamaearth+Bye+Bye+Dark+Circles",
+        "description": "Caffeine + peptides + daisy extract reduce puffiness, darkness and fine lines around eyes.",
+        "concerns": ["dark_circles"],
+        "keyIngredient": "Caffeine + Peptides",
+        "howToUse": "Gently pat a small amount around eye area morning and night.",
+        "step": "Eye Cream"
+    },
+    {
+        "id": "d2",
+        "name": "The Ordinary Caffeine Solution 5% + EGCG",
+        "brand": "The Ordinary",
+        "matchScore": 95,
+        "price": "Rs. 950",
+        "image": "https://images.unsplash.com/photo-1573575155376-b5010099301c?w=400&h=400&fit=crop",
+        "amazonUrl": "https://www.amazon.in/s?k=The+Ordinary+Caffeine+Solution+5%25",
+        "description": "High-strength caffeine constricts blood vessels, visibly reducing dark circles and puffiness.",
+        "concerns": ["dark_circles"],
+        "keyIngredient": "5% Caffeine + EGCG",
+        "howToUse": "Apply a few drops under eyes each morning before moisturizer.",
+        "step": "Serum"
+    },
+    {
+        "id": "d3",
+        "name": "MCaffeine Coffee Under Eye Cream",
+        "brand": "MCaffeine",
+        "matchScore": 93,
+        "price": "Rs. 499",
+        "image": "https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?w=400&h=400&fit=crop",
+        "amazonUrl": "https://www.amazon.in/s?k=MCaffeine+Under+Eye+Cream",
+        "description": "Coffee extracts boost circulation; hyaluronic acid plumps and hydrates the delicate eye area.",
+        "concerns": ["dark_circles"],
+        "keyIngredient": "Coffee Extract + Hyaluronic Acid",
+        "howToUse": "Apply with ring finger gently in circular motion twice daily.",
+        "step": "Eye Cream"
+    },
+    {
+        "id": "d4",
+        "name": "Plum Bright Years Under Eye Recovery Gel",
+        "brand": "Plum",
+        "matchScore": 90,
+        "price": "Rs. 425",
+        "image": "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&h=400&fit=crop",
+        "amazonUrl": "https://www.amazon.in/s?k=Plum+Under+Eye+Recovery+Gel",
+        "description": "Retinol + antioxidants firm the eye area and reduce appearance of fatigue and darkness.",
+        "concerns": ["dark_circles"],
+        "keyIngredient": "Retinol + Ceramides",
+        "howToUse": "Apply at night around orbital bone; avoid direct contact with eyes.",
+        "step": "Treatment (Night)"
+    },
+    {
+        "id": "d5",
+        "name": "Himalaya Revitalizing Under Eye Cream",
+        "brand": "Himalaya",
+        "matchScore": 87,
+        "price": "Rs. 249",
+        "image": "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=400&h=400&fit=crop",
+        "amazonUrl": "https://www.amazon.in/s?k=Himalaya+Under+Eye+Cream",
+        "description": "Aloe vera + rose extracts soothe, hydrate and lighten the under-eye area naturally.",
+        "concerns": ["dark_circles"],
+        "keyIngredient": "Aloe Vera + Rose Extract",
+        "howToUse": "Massage gently under eyes morning and evening. Safe for daily use.",
+        "step": "Moisturizer"
+    },
+
+    # ── ACNE MARKS / SCARS (5 dedicated products) ─────────────────────────────
+    {
+        "id": "m1",
         "name": "Mederma PM Intensive Overnight Scar Cream",
         "brand": "Mederma",
-        "matchScore": 92,
+        "matchScore": 98,
         "price": "Rs. 1,250",
-        "image": "https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?w=400&h=400&fit=crop",
-        "amazonUrl": "https://www.amazon.in/s?k=scar+cream",
-        "description": "Supports overnight recovery of marks and texture.",
-        "concerns": ["acne_marks"]
+        "image": "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=400&h=400&fit=crop",
+        "amazonUrl": "https://www.amazon.in/s?k=Mederma+PM+Scar+Cream",
+        "description": "Cepalin + Ceramide-NP work overnight to heal and soften raised scars and marks.",
+        "concerns": ["acne_marks"],
+        "keyIngredient": "Cepalin + Ceramide-NP",
+        "howToUse": "Apply to affected area every night. Allow 8 weeks for visible improvement.",
+        "step": "Treatment (Night)"
     },
     {
-        "id": "10",
+        "id": "m2",
+        "name": "Minimalist Tranexamic Acid 3% + Niacinamide",
+        "brand": "Minimalist",
+        "matchScore": 96,
+        "price": "Rs. 549",
+        "image": "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=400&h=400&fit=crop",
+        "amazonUrl": "https://www.amazon.in/s?k=Minimalist+Tranexamic+Acid",
+        "description": "Tranexamic acid blocks melanin transfer, rapidly fading post-inflammatory hyperpigmentation.",
+        "concerns": ["acne_marks"],
+        "keyIngredient": "3% Tranexamic Acid + Niacinamide",
+        "howToUse": "Apply 3–4 drops twice daily to areas with marks.",
+        "step": "Serum"
+    },
+    {
+        "id": "m3",
         "name": "Cetaphil Bright Healthy Radiance Night Cream",
         "brand": "Cetaphil",
-        "matchScore": 88,
+        "matchScore": 93,
         "price": "Rs. 1,199",
-        "image": "https://images.unsplash.com/photo-1573575155376-b5010099301c?w=400&h=400&fit=crop",
+        "image": "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400&h=400&fit=crop",
         "amazonUrl": "https://www.amazon.in/s?k=Cetaphil+Bright+Healthy+Radiance",
-        "description": "Hydrating brightening cream for stubborn dark spots.",
-        "concerns": ["pigmentation", "acne_marks"]
-    }
+        "description": "Vitamin B3 + Turmeric brighten and even out skin tone while repairing barrier overnight.",
+        "concerns": ["acne_marks"],
+        "keyIngredient": "Vitamin B3 + Turmeric Extract",
+        "howToUse": "Apply as the last step of your night routine.",
+        "step": "Moisturizer (Night)"
+    },
+    {
+        "id": "m4",
+        "name": "The Ordinary Alpha Arbutin 2% + HA",
+        "brand": "The Ordinary",
+        "matchScore": 91,
+        "price": "Rs. 640",
+        "image": "https://images.unsplash.com/photo-1608248597279-f99d160bfcbc?w=400&h=400&fit=crop",
+        "amazonUrl": "https://www.amazon.in/s?k=The+Ordinary+Alpha+Arbutin",
+        "description": "Fades dark spots and post-acne marks with precision. Suitable for all skin tones.",
+        "concerns": ["acne_marks"],
+        "keyIngredient": "2% Alpha Arbutin + Hyaluronic Acid",
+        "howToUse": "Apply to full face twice daily after cleansing and before moisturizer.",
+        "step": "Serum"
+    },
+    {
+        "id": "m5",
+        "name": "WOW Skin Science 10% Vitamin C Serum",
+        "brand": "WOW Skin Science",
+        "matchScore": 88,
+        "price": "Rs. 499",
+        "image": "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400&h=400&fit=crop",
+        "amazonUrl": "https://www.amazon.in/s?k=WOW+Vitamin+C+Serum",
+        "description": "High-potency Vitamin C brightens scars, boosts collagen and protects skin from UV damage.",
+        "concerns": ["acne_marks"],
+        "keyIngredient": "10% Vitamin C + Hyaluronic Acid",
+        "howToUse": "Apply 3–4 drops every morning before SPF.",
+        "step": "Serum (AM)"
+    },
 ]
 
 SKIN_TYPES = [
@@ -204,35 +459,71 @@ CONCERNS = [
 ]
 
 
-def predict_image(filepath: Path) -> str:
+def predict_image(filepath: Path) -> tuple[str, float]:
+    """Run TFLite inference and return (predicted_label, confidence_percent)."""
     image = cv2.imread(str(filepath))
     if image is None:
-        return "Unable to read image"
+        return "Unable to read image", 0.0
     image = cv2.resize(image, (224, 224))
     image = np.asarray(image)
     image = (image.astype(np.float32) / 127.5) - 1
     image = np.reshape(image, (1, 224, 224, 3))
-    
-    # Run TFLite inference
+
     interpreter.set_tensor(input_details[0]['index'], image)
     interpreter.invoke()
-    prediction = interpreter.get_tensor(output_details[0]['index'])
-    
-    index = int(np.argmax(prediction[0]))
-    return labels[index]
+    prediction = interpreter.get_tensor(output_details[0]['index'])[0]  # shape: (7,)
+
+    index = int(np.argmax(prediction))
+    confidence = float(prediction[index]) * 100.0
+    return labels[index], round(confidence, 1)
 
 
 def selected_products(concern: str) -> list[dict[str, Any]]:
+    """Return all products for the given concern, sorted by matchScore descending."""
     return sorted([p for p in PRODUCTS if concern in p["concerns"]], key=lambda p: p["matchScore"], reverse=True)
 
 
-def score_for(concern: str, skin_type: str, texture: str, image_name: str) -> str:
-    base = {"acne": 6.3, "open_pores": 6.7, "pigmentation": 6.1, "dark_circles": 6.5, "acne_marks": 6.0}
-    texture_shift = {"oily": -0.4, "dry": 0.3, "combination": -0.1}
-    type_shift = {"normal": 0.4, "sensitive": -0.2}
-    seed_shift = (len(image_name or "capture") % 5) * 0.09
-    value = base.get(concern, 6.2) + texture_shift.get(texture, 0) + type_shift.get(skin_type, 0) + seed_shift
-    return f"{max(4.8, min(9.4, value)):.1f}"
+def ai_skin_score(confidence: float, concern: str, skin_type: str, texture: str) -> str:
+    """Derive a 0-10 Skin Health Score from the real AI confidence.
+
+    Mapping:
+      - Base score = confidence (0-100) rescaled to 4.0-9.5 range
+      - Adjusted slightly by skin type and texture for context
+    """
+    # Rescale AI confidence (0-100) to score range (4.0 – 9.5)
+    base = 4.0 + (confidence / 100.0) * 5.5
+    # Small contextual tweaks (±0.3 max) – do NOT use image filename anymore
+    texture_adj = {"oily": -0.2, "dry": +0.1, "combination": 0.0}.get(texture, 0)
+    type_adj = {"normal": +0.1, "sensitive": -0.1}.get(skin_type, 0)
+    value = base + texture_adj + type_adj
+    return f"{max(4.0, min(9.5, value)):.1f}"
+
+
+def build_recommendations(concern: str, skin_type: str, texture: str) -> list[str]:
+    """Return a tailored set of 4 recommendations based on concern + skin profile."""
+    concern_tips: dict[str, str] = {
+        "acne": "Use oil-control cleansing, avoid touching your face, and apply spot treatments with salicylic acid or benzoyl peroxide.",
+        "open_pores": "Use niacinamide and BHA to refine pores. Never skip SPF — UV breaks down collagen and widens pores.",
+        "pigmentation": "Brighten with Vitamin C in the AM and a tyrosinase inhibitor (kojic acid / arbutin) at night. SPF is non-negotiable.",
+        "dark_circles": "Apply a caffeine eye serum in the morning to reduce puffiness. Sleep 7-9 hours and elevate your head slightly.",
+        "acne_marks": "Use tranexamic acid or alpha arbutin to fade marks. Avoid picking skin — it deepens PIH significantly.",
+    }
+    texture_tips: dict[str, str] = {
+        "oily": "Choose lightweight gel moisturisers and double-cleanse at night to remove excess sebum buildup.",
+        "dry": "Layer a ceramide-rich moisturiser over your serums and avoid foaming cleansers that strip natural oils.",
+        "combination": "Apply richer hydration to dry cheeks and lighter, mattifying products only on the oily T-zone.",
+    }
+    skin_type_tips: dict[str, str] = {
+        "sensitive": "Patch-test every new product, choose fragrance-free formulas, and introduce actives one at a time.",
+        "normal": "Maintain a consistent AM/PM routine — stability prevents sensitisation and keeps your skin barrier strong.",
+    }
+    morning_tip = "Every morning: Cleanse → Vitamin C Serum → Moisturiser → SPF 30+. Never skip sunscreen indoors or outdoors."
+    return [
+        concern_tips.get(concern, ""),
+        texture_tips.get(texture, ""),
+        skin_type_tips.get(skin_type, ""),
+        morning_tip,
+    ]
 
 
 def read_history() -> list[dict[str, str]]:
@@ -314,20 +605,51 @@ def result():
         return redirect(url_for("dashboard"))
 
     image_path = UPLOAD_FOLDER / image_name
-    model_label = predict_image(image_path)
-    profile = CONCERN_PROFILES[concern]
-    score = score_for(concern, skin_type, texture, image_name)
-    recommendations = [profile["recommendationDescription"]]
-    recommendations.append("Use lightweight gel products and wash twice daily." if texture == "oily" else "Add ceramide-rich moisturizers and avoid over-cleansing." if texture == "dry" else "Balance T-zone oil with gentle hydration for cheeks.")
-    recommendations.append("Choose fragrance-free formulas and patch test first." if skin_type == "sensitive" else "Use a consistent AM/PM routine and avoid frequent product switching.")
 
+    # Real AI prediction with confidence
+    model_label, confidence = predict_image(image_path)
+
+    profile = CONCERN_PROFILES[concern]
+
+    # AI-confidence-driven skin score
+    score = ai_skin_score(confidence, concern, skin_type, texture)
+
+    # Tailored recommendations
+    recommendations = build_recommendations(concern, skin_type, texture)
+
+    # All 5 unique products for this concern
+    concern_products = selected_products(concern)
+
+    # Persist to history
     rows = read_history()
     record_id = f"{session['user_name']}-{image_name}"
     if not any(row.get("id") == record_id for row in rows):
-        rows.append({"id": record_id, "userName": session["user_name"], "score": score, "disease": profile["diseaseName"], "createdAt": datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
+        rows.append({
+            "id": record_id,
+            "userName": session["user_name"],
+            "score": score,
+            "confidence": f"{confidence:.1f}%",
+            "disease": profile["diseaseName"],
+            "aiDetected": model_label,
+            "concern": profile["title"],
+            "skinType": skin_type,
+            "texture": texture,
+            "createdAt": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        })
         write_history(rows)
 
-    return render_template("result.html", profile=profile, score=score, model_label=model_label, image_name=image_name, recommendations=recommendations, products=selected_products(concern)[:4])
+    return render_template(
+        "result.html",
+        profile=profile,
+        score=score,
+        confidence=confidence,
+        model_label=model_label,
+        image_name=image_name,
+        recommendations=recommendations,
+        products=concern_products,
+        skin_type=skin_type,
+        texture=texture,
+    )
 
 
 @app.route("/products")

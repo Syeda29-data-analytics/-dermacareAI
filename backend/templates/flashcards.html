@@ -1,0 +1,396 @@
+{% extends "base.html" %}
+{% block title %}Flashcards – DermaCareAI{% endblock %}
+{% block content %}
+
+<!-- NAV -->
+<nav class="glass-panel nav fixed">
+  <div class="container nav-inner">
+    <a href="{{ url_for('home') }}">
+      <img class="logo" src="{{ url_for('static', filename='assets/logo.png') }}" alt="DermaCareAI logo" onerror="this.style.display='none'">
+    </a>
+    <div class="nav-links">
+      <a href="{{ url_for('home') }}">Home</a>
+      <a href="{{ url_for('products') }}">Products</a>
+      <a href="{{ url_for('about') }}">About</a>
+      <a href="{{ url_for('flashcards') }}" style="color:var(--primary);font-weight:700;">Flashcards</a>
+    </div>
+    <div class="nav-actions">
+      {% if session.get('user_name') %}
+        <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Dashboard</a>
+        <a href="{{ url_for('logout') }}" class="btn btn-outline">Logout</a>
+      {% else %}
+        <a href="{{ url_for('login') }}" class="btn btn-primary">Get Started</a>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+
+<!-- HERO BANNER -->
+<section class="fc-hero">
+  <div class="container">
+    <div class="fc-hero-inner">
+      <div class="fc-badge">📚 Learn Dermatology</div>
+      <h1 class="fc-hero-title">Skin <span class="gradient-text">Flashcards</span></h1>
+      <p class="fc-hero-sub">Master skin conditions and skincare science with our interactive flashcard deck. Tap any card to reveal the answer.</p>
+      <div class="fc-stats">
+        <div class="fc-stat"><span class="fc-stat-num" id="totalCount">0</span><span class="fc-stat-label">Total Cards</span></div>
+        <div class="fc-stat-div"></div>
+        <div class="fc-stat"><span class="fc-stat-num" id="flippedCount">0</span><span class="fc-stat-label">Reviewed</span></div>
+        <div class="fc-stat-div"></div>
+        <div class="fc-stat"><span class="fc-stat-num" id="progressPct">0%</span><span class="fc-stat-label">Progress</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FILTER TABS -->
+<section class="fc-controls-section">
+  <div class="container">
+    <div class="fc-controls">
+      <div class="fc-filter-tabs" role="tablist" aria-label="Card categories">
+        <button class="fc-tab active" data-cat="all" role="tab" aria-selected="true" id="tab-all">All Cards</button>
+        <button class="fc-tab" data-cat="condition" role="tab" aria-selected="false" id="tab-condition">🩺 Skin Conditions</button>
+        <button class="fc-tab" data-cat="ingredient" role="tab" aria-selected="false" id="tab-ingredient">🧪 Ingredients</button>
+        <button class="fc-tab" data-cat="routine" role="tab" aria-selected="false" id="tab-routine">✨ Routine Tips</button>
+      </div>
+      <button class="fc-shuffle-btn" id="shuffleBtn" aria-label="Shuffle cards">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/></svg>
+        Shuffle
+      </button>
+    </div>
+    <!-- Progress bar -->
+    <div class="fc-progress-wrap">
+      <div class="fc-progress-bar" id="progressBar" style="width:0%"></div>
+    </div>
+  </div>
+</section>
+
+<!-- CARDS GRID -->
+<section class="fc-grid-section">
+  <div class="container">
+    <div class="fc-grid" id="cardGrid">
+      <!-- Cards injected by JS -->
+    </div>
+    <div class="fc-empty" id="emptyMsg" style="display:none">
+      <div class="fc-empty-icon">🔍</div>
+      <p>No cards in this category.</p>
+    </div>
+  </div>
+</section>
+
+<!-- RESET BAR -->
+<section class="fc-reset-section">
+  <div class="container fc-reset-inner">
+    <p class="fc-reset-text">Reviewed all cards in this deck? Reset to start fresh.</p>
+    <button class="btn btn-outline fc-reset-btn" id="resetBtn">Reset Progress</button>
+  </div>
+</section>
+
+<style>
+/* ── FLASHCARD PAGE ─────────────────────────────────────── */
+.fc-hero {
+  padding: 130px 0 56px;
+  background: linear-gradient(160deg,#eefafb 0%,#f7f9fb 60%,#edf5ff 100%);
+}
+.fc-hero-inner { max-width: 680px; }
+.fc-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 14px; border-radius: 999px;
+  background: rgba(8,127,140,.12); color: var(--primary);
+  font: 600 13px 'JetBrains Mono', monospace; margin-bottom: 20px;
+}
+.fc-hero-title { font-size: clamp(40px,6vw,62px); line-height: 1.05; margin-bottom: 18px; }
+.fc-hero-sub { color: var(--muted); font-size: 18px; line-height: 1.7; margin-bottom: 36px; max-width: 580px; }
+.fc-stats { display: flex; align-items: center; gap: 0; }
+.fc-stat { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 0 28px 0 0; }
+.fc-stat:first-child { padding-left: 0; }
+.fc-stat-num { font: 700 28px 'JetBrains Mono', monospace; color: var(--primary); }
+.fc-stat-label { font-size: 13px; color: var(--muted); font-weight: 500; }
+.fc-stat-div { width: 1px; height: 38px; background: var(--border); margin-right: 28px; }
+
+/* Controls */
+.fc-controls-section { padding: 32px 0 12px; }
+.fc-controls { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+.fc-filter-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+.fc-tab {
+  padding: 9px 20px; border-radius: 999px; border: 1.5px solid var(--border);
+  background: white; font: 600 14px inherit; cursor: pointer; color: var(--muted);
+  transition: all .2s ease;
+}
+.fc-tab:hover { border-color: var(--primary); color: var(--primary); }
+.fc-tab.active { background: var(--primary); color: white; border-color: var(--primary); }
+.fc-shuffle-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 20px; border-radius: 12px; border: 1.5px solid var(--border);
+  background: white; font: 600 14px inherit; cursor: pointer; color: var(--foreground);
+  transition: all .2s ease;
+}
+.fc-shuffle-btn:hover { background: var(--secondary); transform: translateY(-1px); }
+.fc-progress-wrap { height: 4px; background: var(--border); border-radius: 999px; margin-top: 20px; overflow: hidden; }
+.fc-progress-bar { height: 100%; background: var(--gradient-hero); border-radius: 999px; transition: width .5s ease; }
+
+/* Grid */
+.fc-grid-section { padding: 32px 0 60px; }
+.fc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+/* Card */
+.fc-card-wrap {
+  perspective: 1200px;
+  height: 220px;
+  cursor: pointer;
+}
+.fc-card-wrap.tall { height: 270px; }
+.fc-card-inner {
+  width: 100%; height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform .55s cubic-bezier(.4,0,.2,1);
+  border-radius: 22px;
+}
+.fc-card-wrap.flipped .fc-card-inner { transform: rotateY(180deg); }
+
+.fc-card-face {
+  position: absolute; inset: 0;
+  backface-visibility: hidden;
+  border-radius: 22px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+}
+/* Front */
+.fc-card-front {
+  background: white;
+  border: 1.5px solid var(--border);
+  box-shadow: 0 4px 20px rgba(0,0,0,.07);
+}
+.fc-card-front::before {
+  content: '';
+  position: absolute; top: -40px; right: -40px;
+  width: 130px; height: 130px;
+  border-radius: 999px;
+  opacity: .07;
+}
+.cat-condition .fc-card-front::before { background: #e5484d; }
+.cat-ingredient .fc-card-front::before { background: #0897a5; }
+.cat-routine .fc-card-front::before { background: #2eb872; }
+
+.fc-card-back {
+  background: linear-gradient(135deg,#087f8c,#2eb872);
+  transform: rotateY(180deg);
+  color: white;
+}
+.fc-card-front:hover { border-color: var(--primary); box-shadow: 0 8px 28px rgba(8,127,140,.18); }
+
+.fc-card-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  font: 600 11px 'JetBrains Mono', monospace;
+  padding: 4px 10px; border-radius: 999px;
+  width: fit-content;
+}
+.cat-condition .fc-card-tag { background: rgba(229,72,77,.1); color: #e5484d; }
+.cat-ingredient .fc-card-tag { background: rgba(8,151,165,.1); color: #0897a5; }
+.cat-routine .fc-card-tag { background: rgba(46,184,114,.1); color: #2eb872; }
+
+.fc-card-q {
+  font: 700 17px 'Space Grotesk', sans-serif;
+  color: var(--foreground);
+  line-height: 1.4;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+.fc-tap-hint {
+  font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 4px;
+}
+.fc-card-back .fc-card-tag { background: rgba(255,255,255,.2); color: white; }
+.fc-card-answer {
+  font-size: 15px; line-height: 1.65;
+  flex: 1; display: flex; align-items: center;
+  color: rgba(255,255,255,.95);
+}
+.fc-card-reviewed {
+  font-size: 12px; color: rgba(255,255,255,.7);
+  display: flex; align-items: center; gap: 5px;
+}
+.fc-card-reviewed::before { content: '✓'; }
+
+/* Reviewed state shimmer on front */
+.fc-card-wrap.reviewed .fc-card-front {
+  background: linear-gradient(135deg,#f0fafb,#f7fffe);
+  border-color: rgba(8,127,140,.3);
+}
+
+/* Empty */
+.fc-empty { text-align: center; padding: 60px 0; color: var(--muted); }
+.fc-empty-icon { font-size: 48px; margin-bottom: 14px; }
+
+/* Reset */
+.fc-reset-section { padding: 32px 0 60px; }
+.fc-reset-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+.fc-reset-text { color: var(--muted); font-size: 15px; margin: 0; }
+
+@media (max-width: 640px) {
+  .fc-hero { padding-top: 110px; }
+  .fc-grid { grid-template-columns: 1fr; }
+  .fc-controls { flex-direction: column; align-items: flex-start; }
+  .fc-stats { flex-wrap: wrap; gap: 16px; }
+  .fc-stat-div { display: none; }
+  .fc-reset-inner { flex-direction: column; text-align: center; }
+}
+</style>
+
+<script>
+const CARDS = [
+  /* ── SKIN CONDITIONS ── */
+  {cat:"condition", emoji:"🔴", q:"What is Acne Vulgaris?", a:"A skin disorder caused by clogged hair follicles with oil and dead skin cells. Results in whiteheads, blackheads, pimples, and cysts. Most common on the face, chest, and back."},
+  {cat:"condition", emoji:"😣", q:"What triggers Acne breakouts?", a:"Key triggers: excess sebum production, Propionibacterium acnes bacteria, hormonal changes (androgens), certain medications, and high glycaemic foods."},
+  {cat:"condition", emoji:"🌿", q:"What is Eczema (Atopic Dermatitis)?", a:"A chronic inflammatory skin condition causing dry, itchy, inflamed skin. Linked to a weak skin barrier, immune hypersensitivity, and often runs alongside allergies and asthma."},
+  {cat:"condition", emoji:"❄️", q:"What are common Eczema triggers?", a:"Triggers include: harsh soaps/detergents, extreme temperatures, sweat, stress, dust mites, pet dander, certain foods (dairy, eggs, nuts), and synthetic fabrics."},
+  {cat:"condition", emoji:"🔶", q:"What is Psoriasis?", a:"An autoimmune condition speeding up the skin cell life cycle. Cells build up rapidly on the surface, forming scales and red patches that can be itchy and sometimes painful."},
+  {cat:"condition", emoji:"🌹", q:"What is Rosacea?", a:"A chronic skin condition causing redness, visible blood vessels (telangiectasia), and sometimes acne-like bumps mostly on the face. Often misdiagnosed as eczema or acne."},
+  {cat:"condition", emoji:"⬜", q:"What is Vitiligo?", a:"A long-term condition where patches of skin lose their pigment due to the immune system attacking melanocytes. Affects ~1-2% of the population and can occur on any body part."},
+  {cat:"condition", emoji:"🟤", q:"What is Melasma?", a:"A common skin problem causing brown or dark patches on the face, particularly cheeks, nose, forehead, and upper lip. Triggered by sun exposure and hormonal changes."},
+  {cat:"condition", emoji:"🌑", q:"What is Periorbital Hyperpigmentation (Dark Circles)?", a:"Darkening of the skin around the eyes due to increased melanin, thin skin revealing blood vessels, genetics, fatigue, or loss of volume and shadowing with age."},
+  {cat:"condition", emoji:"⚪", q:"What are Post-Acne Marks (PIH)?", a:"Post-inflammatory hyperpigmentation (PIH) are flat discolored areas left after an acne lesion heals. Caused by melanin triggered by inflammation — not true scars."},
+  {cat:"condition", emoji:"🕳️", q:"What causes Enlarged Pores?", a:"Enlarged pores are mainly due to excess sebum production, loss of skin elasticity with age, and sun damage. Cannot be 'opened' or 'closed' but their appearance can be minimized."},
+  {cat:"condition", emoji:"🧬", q:"What is the skin barrier and why does it matter?", a:"The outermost layer of skin (stratum corneum) that retains moisture and blocks pathogens. A damaged barrier leads to sensitivity, dryness, eczema flares, and increased acne."},
+
+  /* ── SKINCARE INGREDIENTS ── */
+  {cat:"ingredient", emoji:"🧪", q:"What does Niacinamide (Vitamin B3) do?", a:"Multi-functional: reduces sebum production, minimises pore appearance, fades hyperpigmentation, strengthens the skin barrier, soothes redness, and improves overall skin texture."},
+  {cat:"ingredient", emoji:"🔬", q:"What is Salicylic Acid (BHA) used for?", a:"A beta-hydroxy acid (BHA) that is oil-soluble, allowing it to penetrate inside pores. Exfoliates dead cells inside follicles, unclogs pores, and fights acne-causing bacteria. Ideal for oily/acne-prone skin."},
+  {cat:"ingredient", emoji:"✨", q:"What does Retinol (Vitamin A) do for skin?", a:"Speeds up cell turnover, stimulates collagen production, unclogs pores, fades dark spots and fine lines. Start at low concentration (0.1-0.25%) and build tolerance. Always apply at night with SPF next morning."},
+  {cat:"ingredient", emoji:"🍊", q:"What is Vitamin C (Ascorbic Acid) used for?", a:"A powerful antioxidant that brightens skin, fades hyperpigmentation, stimulates collagen, and neutralises free radicals from UV exposure. Most effective at pH 2.5-3.5."},
+  {cat:"ingredient", emoji:"💧", q:"What is Hyaluronic Acid (HA)?", a:"A humectant that holds up to 1000× its weight in water. Draws moisture into the skin to plump and hydrate. Apply on damp skin and seal with a moisturiser for best results."},
+  {cat:"ingredient", emoji:"🧴", q:"What are Ceramides and why are they important?", a:"Lipids (fats) naturally found in the skin barrier. Help retain moisture, protect against environmental aggressors, and repair a compromised barrier. Essential for dry and sensitive skin types."},
+  {cat:"ingredient", emoji:"🍶", q:"What does Azelaic Acid treat?", a:"Treats acne (kills P. acnes bacteria), rosacea (reduces redness and bumps), and hyperpigmentation (inhibits tyrosinase). Safe for sensitive skin and pregnancy. Available in 10-20% concentrations."},
+  {cat:"ingredient", emoji:"🌿", q:"What is Glycolic Acid (AHA)?", a:"An alpha-hydroxy acid (AHA) derived from sugar cane. Exfoliates the skin surface, smoothens texture, fades dark spots, and stimulates collagen. Water-soluble, best for normal/combination/dry skin."},
+  {cat:"ingredient", emoji:"☕", q:"What does Caffeine do in skincare?", a:"Vasoconstrictive agent that tightens blood vessels, reducing puffiness and dark circles. Also an antioxidant. Commonly used in eye serums and creams to de-puff the undereye area."},
+  {cat:"ingredient", emoji:"🟡", q:"What is Kojic Acid used for?", a:"Derived from fungi, it inhibits tyrosinase (enzyme responsible for melanin production). Effective for treating hyperpigmentation, dark spots, age spots, and melasma. Often paired with Vitamin C."},
+  {cat:"ingredient", emoji:"💎", q:"What are Peptides in skincare?", a:"Short chains of amino acids (protein building blocks). Signal the skin to produce more collagen and elastin, helping to firm skin, reduce wrinkles, and repair the barrier. Very skin-friendly and suitable for all types."},
+  {cat:"ingredient", emoji:"🧊", q:"What is Centella Asiatica (Cica) good for?", a:"A plant extract packed with triterpenoids that soothe redness, accelerate wound healing, strengthen the skin barrier, and calm inflammation. Ideal for sensitive, acne-prone, and post-procedure skin."},
+  {cat:"ingredient", emoji:"🌱", q:"What does Lactic Acid do?", a:"A mild AHA that gently exfoliates and is also a humectant. Effective at improving skin texture and tone. Gentler than glycolic acid — a great starting AHA for sensitive or dry skin types."},
+  {cat:"ingredient", emoji:"🔵", q:"What is Zinc in skincare?", a:"Anti-inflammatory and antimicrobial mineral. Reduces acne severity, calms redness, and regulates sebum production. Found in zinc oxide (physical SPF) and zinc PCA in targeted serums."},
+
+  /* ── ROUTINE TIPS ── */
+  {cat:"routine", emoji:"🌅", q:"What is the correct AM skincare order?", a:"1. Cleanser → 2. Toner (optional) → 3. Antioxidant Serum (Vit C) → 4. Eye Cream → 5. Moisturiser → 6. SPF (always last, always required)."},
+  {cat:"routine", emoji:"🌙", q:"What is the correct PM skincare order?", a:"1. Cleanse (double cleanse if wearing makeup/SPF) → 2. Exfoliant (2-3×/week) → 3. Treatment Serum (Retinol/Niacinamide) → 4. Eye Cream → 5. Moisturiser → 6. Facial Oil (optional, locks everything in)."},
+  {cat:"routine", emoji:"☀️", q:"Why is SPF the most important skincare product?", a:"UV radiation is the #1 cause of premature ageing, hyperpigmentation, and skin cancer. Use broad-spectrum SPF 30+ daily, even indoors and on cloudy days. Reapply every 2 hours when outdoors."},
+  {cat:"routine", emoji:"🔄", q:"Can you layer Niacinamide and Vitamin C together?", a:"Yes — the old claim that they cause niacin flushing is largely a myth at modern low-temperature formulation. Both can be used in the same routine. Apply water-based Vitamin C first, then Niacinamide."},
+  {cat:"routine", emoji:"⚠️", q:"What ingredients should NOT be combined?", a:"Avoid: Retinol + AHA/BHA (too irritating), Retinol + Vitamin C (both can irritate), Benzoyl Peroxide + Retinol (deactivates retinol). Use on alternate nights or at different times of day."},
+  {cat:"routine", emoji:"🛡️", q:"How do you repair a damaged skin barrier?", a:"Stop all active ingredients temporarily. Use a gentle cleanser, fragrance-free ceramide moisturiser, and only SPF. Add back one ingredient at a time after 2-4 weeks. Avoid over-washing and hot water."},
+  {cat:"routine", emoji:"💦", q:"How much water should you drink for good skin?", a:"Aim for 2-3 litres per day. Hydration from within supports skin elasticity and flush out toxins. However, topical skincare (especially humectants like hyaluronic acid) directly impacts skin hydration more than water intake alone."},
+  {cat:"routine", emoji:"🍽️", q:"What diet habits support clearer skin?", a:"Low glycaemic diet (avoid refined sugars), increase omega-3s (fatty fish, walnuts, flaxseeds), eat antioxidant-rich foods (berries, leafy greens), and limit dairy if prone to acne breakouts."},
+];
+
+let currentCat = 'all';
+let flippedSet = new Set(JSON.parse(localStorage.getItem('fc_flipped') || '[]'));
+
+function saveFlipped() {
+  localStorage.setItem('fc_flipped', JSON.stringify([...flippedSet]));
+}
+
+function getFiltered() {
+  if (currentCat === 'all') return [...CARDS];
+  return CARDS.filter(c => c.cat === currentCat);
+}
+
+let displayCards = [...CARDS];
+
+function updateStats() {
+  const total = displayCards.length;
+  const flipped = displayCards.filter((_,i) => flippedSet.has(displayCards[i]._id)).length;
+  const pct = total ? Math.round((flipped / total) * 100) : 0;
+  document.getElementById('totalCount').textContent = total;
+  document.getElementById('flippedCount').textContent = flipped;
+  document.getElementById('progressPct').textContent = pct + '%';
+  document.getElementById('progressBar').style.width = pct + '%';
+}
+
+function renderCards() {
+  const grid = document.getElementById('cardGrid');
+  const empty = document.getElementById('emptyMsg');
+  grid.innerHTML = '';
+  if (!displayCards.length) { empty.style.display = 'block'; updateStats(); return; }
+  empty.style.display = 'none';
+
+  displayCards.forEach((card, i) => {
+    const wrap = document.createElement('div');
+    wrap.className = `fc-card-wrap cat-${card.cat}${card.a.length > 140 ? ' tall' : ''}${flippedSet.has(card._id) ? ' reviewed flipped' : ''}`;
+    wrap.setAttribute('role', 'button');
+    wrap.setAttribute('tabindex', '0');
+    wrap.setAttribute('aria-label', `Flashcard: ${card.q}`);
+    wrap.innerHTML = `
+      <div class="fc-card-inner">
+        <div class="fc-card-face fc-card-front">
+          <div class="fc-card-tag">${card.emoji} ${card.cat === 'condition' ? 'Skin Condition' : card.cat === 'ingredient' ? 'Ingredient' : 'Routine Tip'}</div>
+          <div class="fc-card-q">${card.q}</div>
+          <div class="fc-tap-hint">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 11.5V14M12 9v5M17 11.5V14"/><rect x="3" y="3" width="18" height="18" rx="3"/></svg>
+            Tap to reveal
+          </div>
+        </div>
+        <div class="fc-card-face fc-card-back">
+          <div class="fc-card-tag">${card.emoji} Answer</div>
+          <div class="fc-card-answer">${card.a}</div>
+          <div class="fc-card-reviewed">Reviewed</div>
+        </div>
+      </div>`;
+
+    wrap.addEventListener('click', () => toggleFlip(wrap, card._id));
+    wrap.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleFlip(wrap, card._id); } });
+    grid.appendChild(wrap);
+  });
+
+  updateStats();
+}
+
+function toggleFlip(wrap, id) {
+  wrap.classList.toggle('flipped');
+  if (wrap.classList.contains('flipped')) {
+    flippedSet.add(id);
+    wrap.classList.add('reviewed');
+  }
+  saveFlipped();
+  updateStats();
+}
+
+// Assign stable IDs
+CARDS.forEach((c, i) => c._id = i);
+
+// Tab switching
+document.querySelectorAll('.fc-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.fc-tab').forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected','false'); });
+    tab.classList.add('active'); tab.setAttribute('aria-selected','true');
+    currentCat = tab.dataset.cat;
+    displayCards = getFiltered();
+    renderCards();
+  });
+});
+
+// Shuffle
+document.getElementById('shuffleBtn').addEventListener('click', () => {
+  displayCards = [...displayCards].sort(() => Math.random() - .5);
+  renderCards();
+});
+
+// Reset
+document.getElementById('resetBtn').addEventListener('click', () => {
+  flippedSet.clear();
+  saveFlipped();
+  displayCards = getFiltered();
+  renderCards();
+});
+
+// Initial render
+displayCards = [...CARDS];
+renderCards();
+</script>
+
+{% endblock %}
