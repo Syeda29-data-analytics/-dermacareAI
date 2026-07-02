@@ -459,6 +459,44 @@ CONCERNS = [
 ]
 
 
+def is_skin_image(filepath: Path) -> bool:
+    """Check if the image contains a reasonable amount of skin color in YCrCb space."""
+    try:
+        image = cv2.imread(str(filepath))
+        if image is None:
+            return False
+        
+        # Downscale for performance since we only need color statistics
+        h, w = image.shape[:2]
+        max_dim = 400
+        if max(h, w) > max_dim:
+            scale = max_dim / max(h, w)
+            image = cv2.resize(image, (0, 0), fx=scale, fy=scale)
+
+        # Convert to YCrCb color space
+        ycrcb = cv2.cvtColor(image, cv2.COLOR_BGR2YCR_CB)
+        
+        # Standard skin color range for YCrCb: Cr in [130, 180], Cb in [75, 135]
+        lower_skin = np.array([0, 130, 75], dtype=np.uint8)
+        upper_skin = np.array([255, 180, 135], dtype=np.uint8)
+        
+        mask = cv2.inRange(ycrcb, lower_skin, upper_skin)
+        
+        # Calculate the percentage of skin pixels
+        total_pixels = mask.size
+        skin_pixels = cv2.countNonZero(mask)
+        percentage = (skin_pixels / total_pixels) * 100.0
+        
+        # Log to stdout for tracking
+        print(f"Skin verification percentage: {percentage:.2f}% for {filepath.name}", flush=True)
+        
+        # If at least 10% of the image is skin, it passes
+        return percentage >= 10.0
+    except Exception as e:
+        print(f"Error during skin check: {e}", flush=True)
+        return False
+
+
 def predict_image(filepath: Path) -> tuple[str, float]:
     """Run TFLite inference and return (predicted_label, confidence_percent)."""
     image = cv2.imread(str(filepath))
@@ -569,6 +607,16 @@ def dashboard():
         filename = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{secure_filename(image.filename)}"
         filepath = UPLOAD_FOLDER / filename
         image.save(filepath)
+        
+        # Verify if it's actually a skin image
+        if not is_skin_image(filepath):
+            try:
+                filepath.unlink()  # delete invalid image
+            except Exception:
+                pass
+            flash("Error: Please upload a valid skin image.")
+            return redirect(url_for("dashboard"))
+            
         session["scan_image"] = filename
         return redirect(url_for("analysis", step="skin_type"))
     return render_template("dashboard.html", user_name=session["user_name"])
