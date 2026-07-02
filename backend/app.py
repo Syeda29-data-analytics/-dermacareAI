@@ -546,30 +546,38 @@ def ai_skin_score(confidence: float, concern: str, skin_type: str, texture: str)
 
 
 def build_recommendations(concern: str, skin_type: str, texture: str) -> list[str]:
-    """Return a tailored set of 4 recommendations based on concern + skin profile."""
-    concern_tips: dict[str, str] = {
-        "acne": "Use oil-control cleansing, avoid touching your face, and apply spot treatments with salicylic acid or benzoyl peroxide.",
-        "open_pores": "Use niacinamide and BHA to refine pores. Never skip SPF — UV breaks down collagen and widens pores.",
-        "pigmentation": "Brighten with Vitamin C in the AM and a tyrosinase inhibitor (kojic acid / arbutin) at night. SPF is non-negotiable.",
-        "dark_circles": "Apply a caffeine eye serum in the morning to reduce puffiness. Sleep 7-9 hours and elevate your head slightly.",
-        "acne_marks": "Use tranexamic acid or alpha arbutin to fade marks. Avoid picking skin — it deepens PIH significantly.",
+    """Return exactly 3 highly specific, complete recommendations tailored to the detected skin condition."""
+
+    RECS: dict[str, list[str]] = {
+        "acne": [
+            "🧴 Cleanse twice daily with a salicylic acid (BHA) face wash to dissolve oil inside pores. Follow with a non-comedogenic, oil-free moisturiser — skipping moisturiser worsens oil production.",
+            "💊 Apply a 2.5% benzoyl peroxide spot treatment only on active breakouts at night. Never pop pimples — this forces bacteria deeper and leaves permanent marks.",
+            "🌞 Wear SPF 30+ every morning (even indoors). UV exposure inflames existing acne and darkens fresh pimple marks into long-lasting PIH (post-inflammatory hyperpigmentation).",
+        ],
+        "open_pores": [
+            "🔬 Apply a 10% Niacinamide serum twice daily — it regulates sebum production, tightens pore walls, and visibly reduces pore size within 4–8 weeks.",
+            "🧹 Use a BHA (salicylic acid) exfoliant 2–3 times per week at night to dissolve the dead-skin plugs that stretch pores open. Avoid harsh scrubs, which cause micro-tears.",
+            "🌞 Apply broad-spectrum SPF 50+ every morning. UV rays break down collagen that keeps pore walls firm — daily sun protection is the single most effective pore-prevention habit.",
+        ],
+        "pigmentation": [
+            "✨ Use a Vitamin C serum (10–20%) every morning on cleansed skin before SPF. Vitamin C neutralises free radicals that trigger melanin overproduction and brightens existing dark patches.",
+            "🌙 Apply a tyrosinase inhibitor at night — 2% kojic acid, 2% alpha arbutin, or 3% tranexamic acid. These block melanin at its source and are safe for long-term use on all skin tones.",
+            "🌞 Reapply SPF 50+ every 2 hours when outdoors. UV is the #1 trigger for hyperpigmentation — without daily sun protection, all brightening treatments are significantly less effective.",
+        ],
+        "dark_circles": [
+            "☕ Apply a 5% caffeine eye serum every morning by gently patting (never rubbing) under your eyes. Caffeine constricts dilated blood vessels and reduces both puffiness and dark discolouration.",
+            "💤 Sleep 7–9 hours with your head slightly elevated to prevent fluid pooling under eyes. Use a silk pillowcase — cotton creates friction that breaks delicate capillaries overnight.",
+            "💧 Apply a hydrating eye cream with peptides and hyaluronic acid at night. The under-eye skin is 40% thinner than the rest of your face — it needs dedicated, targeted moisture to recover.",
+        ],
+        "acne_marks": [
+            "🔬 Apply 3% tranexamic acid or 2% alpha arbutin serum twice daily to areas with marks. These ingredients block melanin transfer to skin cells — consistent use shows visible fading in 6–8 weeks.",
+            "🌙 Use a retinol or retinoid moisturiser 2–3 times per week at night. Retinol speeds up cell turnover, pushing pigmented cells to the surface where they shed, revealing clearer skin below.",
+            "🌞 Apply SPF 50+ every single morning — sun exposure darkens post-acne marks dramatically. Shade-seeking and SPF are 50% of the treatment for PIH (post-inflammatory hyperpigmentation).",
+        ],
     }
-    texture_tips: dict[str, str] = {
-        "oily": "Choose lightweight gel moisturisers and double-cleanse at night to remove excess sebum buildup.",
-        "dry": "Layer a ceramide-rich moisturiser over your serums and avoid foaming cleansers that strip natural oils.",
-        "combination": "Apply richer hydration to dry cheeks and lighter, mattifying products only on the oily T-zone.",
-    }
-    skin_type_tips: dict[str, str] = {
-        "sensitive": "Patch-test every new product, choose fragrance-free formulas, and introduce actives one at a time.",
-        "normal": "Maintain a consistent AM/PM routine — stability prevents sensitisation and keeps your skin barrier strong.",
-    }
-    morning_tip = "Every morning: Cleanse → Vitamin C Serum → Moisturiser → SPF 30+. Never skip sunscreen indoors or outdoors."
-    return [
-        concern_tips.get(concern, ""),
-        texture_tips.get(texture, ""),
-        skin_type_tips.get(skin_type, ""),
-        morning_tip,
-    ]
+
+    # Fall back to acne if somehow concern is unrecognised
+    return RECS.get(concern, RECS["acne"])
 
 
 def read_history() -> list[dict[str, str]]:
