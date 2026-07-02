@@ -10,7 +10,7 @@ from pathlib import Path
 import os
 
 BASE_DIR = Path(__file__).resolve().parent
-MODEL_PATH = BASE_DIR / "model.h5"
+MODEL_PATH = BASE_DIR / "model.tflite"
 import sys
 from contextlib import contextmanager
 from datetime import datetime
@@ -43,15 +43,24 @@ def quiet_stderr():
 
 
 with quiet_stderr():
-    from tensorflow.keras.models import load_model
+    try:
+        import tflite_runtime.interpreter as tflite
+    except ImportError:
+        try:
+            import tensorflow.lite as tflite
+        except ImportError:
+            raise ImportError("Neither tflite_runtime nor tensorflow.lite could be imported.")
 
-model = load_model(MODEL_PATH, compile=False)
+interpreter = tflite.Interpreter(model_path=str(MODEL_PATH))
+interpreter.allocate_tensors()
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
 
 BASE_DIR = Path(__file__).resolve().parent
 PROJECT_DIR = BASE_DIR
 UPLOAD_FOLDER = BASE_DIR / "uploads"
 HISTORY_FILE = BASE_DIR / "scan_history.json"
-MODEL_PATH = BASE_DIR / "model.h5"
+MODEL_PATH = BASE_DIR / "model.tflite"
 
 app = Flask(
     __name__,
@@ -62,8 +71,7 @@ app.secret_key = "dermacareai-exam-friendly-secret"
 app.config["UPLOAD_FOLDER"] = str(UPLOAD_FOLDER)
 UPLOAD_FOLDER.mkdir(exist_ok=True)
 
-with quiet_stderr():
-    model = load_model(MODEL_PATH, compile=False)
+# Model loaded successfully as TFLite interpreter
 labels = ["Acne", "Eczema", "Psoriasis", "Rosacea", "Vitiligo", "Melasma", "Healthy"]
 
 CONCERN_PROFILES: dict[str, dict[str, str]] = {
@@ -238,7 +246,9 @@ def predict_image(filepath: Path) -> str:
     image = np.asarray(image)
     image = (image.astype(np.float32) / 127.5) - 1
     image = np.reshape(image, (1, 224, 224, 3))
-    prediction = model.predict(image, verbose=0)
+    interpreter.set_tensor(input_details[0]['index'], image)
+    interpreter.invoke()
+    prediction = interpreter.get_tensor(output_details[0]['index'])
     index = int(np.argmax(prediction))
     return labels[index]
 
