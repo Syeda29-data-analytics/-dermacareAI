@@ -626,38 +626,7 @@ def dashboard():
             return redirect(url_for("dashboard"))
             
         session["scan_image"] = filename
-        
-        # Immediately run AI prediction and set session variables
-        model_label, confidence = predict_image(filepath)
-        label_lower = model_label.lower()
-        
-        if label_lower == "acne":
-            concern = "acne"
-        elif label_lower in ("melasma", "vitiligo"):
-            concern = "pigmentation"
-        elif label_lower in ("eczema", "psoriasis", "rosacea"):
-            concern = "acne_marks"
-        elif label_lower == "healthy":
-            concern = "open_pores"  # default profile for healthy / general care
-        else:
-            concern = "acne"
-            
-        session["concern"] = concern
-        
-        if concern == "acne":
-            session["skin_type"] = "oily"
-            session["texture"] = "uneven"
-        elif concern in ("eczema", "psoriasis", "acne_marks"):
-            session["skin_type"] = "sensitive"
-            session["texture"] = "dry"
-        elif concern == "rosacea":
-            session["skin_type"] = "sensitive"
-            session["texture"] = "rough"
-        else:
-            session["skin_type"] = "normal"
-            session["texture"] = "smooth"
-            
-        return redirect(url_for("result"))
+        return redirect(url_for("analysis", step="skin_type"))
     return render_template("dashboard.html", user_name=session["user_name"])
 
 
@@ -674,11 +643,9 @@ def analysis():
         return redirect(url_for("analysis", step=next_step))
 
     if step == "skin_type":
-        return render_template("question.html", step=step, title="What is your skin type?", description="This helps us with the right ingredients for your skin.", options=SKIN_TYPES, field="skin_type", next_step="skin_texture", stage=0)
-    if step == "skin_texture":
-        return render_template("question.html", step=step, title="What is your skin texture?", description="This helps us know the moisture content in your skin.", options=TEXTURES, field="texture", next_step="concern", back_step="skin_type", stage=0)
+        return render_template("question.html", step=step, title="What is your skin type?", description="This helps us with the right ingredients for your skin.", options=SKIN_TYPES, field="skin_type", next_step="concern", stage=0)
     if step == "concern":
-        return render_template("question.html", step=step, title="Which of these describe your concern?", description="Select any one.", options=CONCERNS, field="concern", next_step="result", back_step="skin_texture", stage=1)
+        return render_template("question.html", step=step, title="Which of these describe your concern?", description="Select any one.", options=CONCERNS, field="concern", next_step="result", back_step="skin_type", stage=1)
     return redirect(url_for("result"))
 
 
@@ -686,9 +653,9 @@ def analysis():
 def result():
     concern = session.get("concern")
     skin_type = session.get("skin_type")
-    texture = session.get("texture")
+    texture = session.get("texture", "combination")
     image_name = session.get("scan_image")
-    if not all([concern, skin_type, texture, image_name]):
+    if not all([concern, skin_type, image_name]):
         return redirect(url_for("dashboard"))
 
     image_path = UPLOAD_FOLDER / image_name
