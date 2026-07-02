@@ -31,19 +31,26 @@ app = Flask(
 app.secret_key = "dermacareai-exam-friendly-secret"
 app.config["UPLOAD_FOLDER"] = str(UPLOAD_FOLDER)
 
-# Load TFLite Model
-try:
-    import tflite_runtime.interpreter as tflite
-except ImportError:
-    try:
-        import tensorflow.lite as tflite
-    except ImportError:
-        raise ImportError("Neither tflite_runtime nor tensorflow.lite could be imported.")
+# TFLite Interpreter lazy loader
+interpreter = None
+input_details = None
+output_details = None
 
-interpreter = tflite.Interpreter(model_path=str(MODEL_PATH))
-interpreter.allocate_tensors()
-input_details = interpreter.get_input_details()
-output_details = interpreter.get_output_details()
+def get_interpreter():
+    global interpreter, input_details, output_details
+    if interpreter is None:
+        try:
+            import tflite_runtime.interpreter as tflite
+        except ImportError:
+            try:
+                import tensorflow.lite as tflite
+            except ImportError:
+                raise ImportError("Neither tflite_runtime nor tensorflow.lite could be imported.")
+        interpreter = tflite.Interpreter(model_path=str(MODEL_PATH))
+        interpreter.allocate_tensors()
+        input_details = interpreter.get_input_details()
+        output_details = interpreter.get_output_details()
+    return interpreter, input_details, output_details
 
 labels = ["Acne", "Eczema", "Psoriasis", "Rosacea", "Vitiligo", "Melasma", "Healthy"]
 
@@ -514,6 +521,7 @@ def predict_image(filepath: Path) -> tuple[str, float]:
     image = (image.astype(np.float32) / 127.5) - 1
     image = np.reshape(image, (1, 224, 224, 3))
 
+    interpreter, input_details, output_details = get_interpreter()
     interpreter.set_tensor(input_details[0]['index'], image)
     interpreter.invoke()
     prediction = interpreter.get_tensor(output_details[0]['index'])[0]  # shape: (7,)
