@@ -626,7 +626,26 @@ def dashboard():
             return redirect(url_for("dashboard"))
             
         session["scan_image"] = filename
-        return redirect(url_for("analysis", step="skin_type"))
+        
+        # Immediately run AI prediction and set session variables
+        model_label, confidence = predict_image(filepath)
+        concern = model_label.lower()
+        session["concern"] = concern
+        
+        if concern == "acne":
+            session["skin_type"] = "oily"
+            session["texture"] = "uneven"
+        elif concern in ("eczema", "psoriasis"):
+            session["skin_type"] = "sensitive"
+            session["texture"] = "dry"
+        elif concern == "rosacea":
+            session["skin_type"] = "sensitive"
+            session["texture"] = "rough"
+        else:
+            session["skin_type"] = "normal"
+            session["texture"] = "smooth"
+            
+        return redirect(url_for("result"))
     return render_template("dashboard.html", user_name=session["user_name"])
 
 
