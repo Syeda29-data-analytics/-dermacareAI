@@ -41,55 +41,69 @@ body { background: var(--surface); font-family: 'Space Grotesk', system-ui, sans
 /* Page shell */
 .rp-shell { max-width: 720px; margin: 0 auto; padding: 24px 20px 80px; display: grid; gap: 20px; }
 
-/* Scanned image */
-.rp-image-wrap { border-radius: 20px; overflow: hidden; aspect-ratio: 16/9; position: relative; }
-.rp-image-wrap img { width: 100%; height: 100%; object-fit: cover; }
-.rp-image-overlay {
-  position: absolute; inset: 0;
-  background: linear-gradient(to top, rgba(8,12,20,.65) 0%, transparent 55%);
-  display: flex; align-items: flex-end; padding: 20px;
-}
-.rp-image-badge {
-  background: rgba(255,255,255,.15);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,.25);
-  border-radius: 12px;
-  padding: 8px 14px;
-  color: white;
-  font-size: 13px; font-weight: 600;
-}
-
-/* AI Score card */
-.rp-score-card {
-  background: var(--grad);
+/* Scanned image & Result card combined */
+.rp-visual-card {
+  position: relative;
+  background: white;
+  border: 1px solid var(--border);
   border-radius: 22px;
-  padding: 28px;
-  color: white;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,.04);
+}
+.rp-image-container {
+  width: 100%;
+  aspect-ratio: 16/9;
+  overflow: hidden;
+  position: relative;
+}
+.rp-image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.rp-result-banner {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--border);
 }
-.rp-score-label { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; opacity: .8; margin-bottom: 6px; }
-.rp-score-value { font-family: 'JetBrains Mono', monospace; font-size: 52px; font-weight: 700; line-height: 1; }
-.rp-score-sub { font-size: 13px; opacity: .8; margin-top: 4px; }
-.rp-confidence-ring { position: relative; width: 100px; height: 100px; flex-shrink: 0; }
-.rp-confidence-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-.rp-confidence-ring .track { fill: none; stroke: rgba(255,255,255,.2); stroke-width: 8; }
-.rp-confidence-ring .fill {
-  fill: none; stroke: white; stroke-width: 8;
-  stroke-linecap: round;
-  stroke-dasharray: 251.2;
-  stroke-dashoffset: calc(251.2 - (251.2 * {{ (confidence / 100)|round(2) }}));
-  transition: stroke-dashoffset 1.2s ease;
+.rp-result-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
-.rp-confidence-label {
-  position: absolute; inset: 0;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  font-family: 'JetBrains Mono', monospace;
+.rp-banner-status {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--muted);
 }
-.rp-confidence-num { font-size: 18px; font-weight: 700; }
-.rp-confidence-sub { font-size: 10px; opacity: .8; }
+.rp-banner-disease {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+.rp-result-right {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.rp-banner-score {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--teal);
+  line-height: 1.1;
+}
+.rp-banner-label {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 500;
+}
 
 /* Section card */
 .rp-card {
@@ -229,29 +243,19 @@ body { background: var(--surface); font-family: 'Space Grotesk', system-ui, sans
 <!-- MAIN CONTENT -->
 <main class="rp-shell">
 
-  <!-- 1. Scanned image -->
-  <div class="rp-image-wrap">
-    <img src="{{ url_for('uploaded_file', filename=image_name) }}" alt="Uploaded skin image">
-    <div class="rp-image-overlay">
-      <div class="rp-image-badge">📸 Scan Complete</div>
+  <!-- 1. Unified Visual & Result Card -->
+  <div class="rp-visual-card">
+    <div class="rp-image-container">
+      <img src="{{ url_for('uploaded_file', filename=image_name) }}" alt="Uploaded skin image">
     </div>
-  </div>
-
-  <!-- 2. AI Score + Confidence Ring -->
-  <div class="rp-score-card">
-    <div>
-      <div class="rp-score-label">AI Skin Health Score</div>
-      <div class="rp-score-value">{{ score }}<span style="font-size:22px;opacity:.7">/10</span></div>
-      <div class="rp-score-sub">Based on real AI model confidence</div>
-    </div>
-    <div class="rp-confidence-ring">
-      <svg viewBox="0 0 100 100">
-        <circle class="track" cx="50" cy="50" r="40"/>
-        <circle class="fill" cx="50" cy="50" r="40"/>
-      </svg>
-      <div class="rp-confidence-label">
-        <span class="rp-confidence-num">{{ confidence }}%</span>
-        <span class="rp-confidence-sub">Confidence</span>
+    <div class="rp-result-banner glass-panel">
+      <div class="rp-result-left">
+        <div class="rp-banner-status">ANALYSIS COMPLETE</div>
+        <strong class="rp-banner-disease">{{ profile.diseaseName }} Detected</strong>
+      </div>
+      <div class="rp-result-right">
+        <div class="rp-banner-score">{{ score }}<span style="font-size:14px;opacity:0.8">/10</span></div>
+        <div class="rp-banner-label">{{ confidence }}% Confidence</div>
       </div>
     </div>
   </div>

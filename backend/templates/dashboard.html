@@ -547,54 +547,12 @@ document.addEventListener('DOMContentLoaded', () => {
     triggerAutoSubmit();
   });
 
-  // Submit and show premium loading overlay
+  // Submit immediately without showing loading overlay
   function triggerAutoSubmit() {
     const file = fileInput.files[0];
     if (!file) return;
-
-    // Create and show analyzing overlay
-    const overlay = document.createElement('div');
-    overlay.className = 'analyzing-overlay';
-    overlay.innerHTML = `
-      <div class="analyzing-pulse-badge">
-        <img src="/static/assets/favicon-v2.png" style="width:74px; height:74px;" alt="Scanning">
-      </div>
-      <h2 style="margin: 0; font-size: 24px; color: var(--foreground); font-family: 'Space Grotesk', sans-serif;">Analyzing Skin Image</h2>
-      <p class="muted" id="analyzing-status-text" style="margin-top: 10px; font-size:16px;">Scanning image...</p>
-    `;
-    document.body.appendChild(overlay);
-    
-    const statuses = [
-      "Uploading image...",
-      "Analyzing skin tone...",
-      "Checking image quality...",
-      "Detecting dermatological features...",
-      "Running AI neural network...",
-      "Calculating confidence scores..."
-    ];
-    let statusIdx = 0;
-    const statusInterval = setInterval(() => {
-      statusIdx = (statusIdx + 1) % statuses.length;
-      const el = document.getElementById('analyzing-status-text');
-      if (el) el.textContent = statuses[statusIdx];
-    }, 1000);
-
-    setTimeout(async () => {
-      try {
-        const arrayBuffer = await file.arrayBuffer();
-        const clonedFile = new File([arrayBuffer], file.name, { type: file.type });
-        const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(clonedFile);
-        fileInput.files = dataTransfer.files;
-        
-        form.dataset.fileCloned = 'true';
-        form.submit();
-      } catch (error) {
-        console.error('File cloning failed:', error);
-        form.dataset.fileCloned = 'true';
-        form.submit();
-      }
-    }, 300);
+    form.dataset.fileCloned = 'true';
+    form.submit();
   }
 });
 </script>
