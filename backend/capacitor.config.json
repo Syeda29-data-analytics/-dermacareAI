@@ -3,7 +3,7 @@
   "appName": "DermaCareAI",
   "webDir": "www",
   "server": {
-    "url": "https://dermacareai-20.onrender.com",
+    "url": "https://dermacareai-23.onrender.com",
     "cleartext": true
   },
   "plugins": {
