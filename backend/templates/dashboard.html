@@ -14,27 +14,370 @@
     <div class="upload-logo-badge">
       <img src="{{ url_for('static', filename='assets/favicon-v2.png') }}" alt="DermaCareAI logo">
     </div>
-    <div><h3>Ready to Scan</h3><p class="muted">Choose an image from gallery to provide your skin image.</p></div>
-    <input class="input" type="file" name="image" accept="image/*" required>
-    <button class="btn btn-primary" type="submit">Analyze Skin &rarr;</button>
+    <div>
+      <h3>Ready to Scan</h3>
+      <p class="muted">Choose an image from gallery or take a photo using your camera.</p>
+    </div>
+    <div class="upload-inputs-group">
+      <div class="file-input-wrapper">
+        <input class="input" type="file" name="image" accept="image/*" required>
+      </div>
+      <div class="or-divider">or</div>
+      <button type="button" class="btn-camera-trigger" id="open-camera-btn">
+        <span>📷</span> Use Camera
+      </button>
+    </div>
+    <button class="btn btn-primary btn-full" type="submit" style="margin-top: 10px;">Analyze Skin &rarr;</button>
   </form>
 </main>
 
+<!-- Camera Modal Overlay -->
+<div id="camera-modal" class="camera-modal-overlay" style="display: none;">
+  <div class="camera-modal-content glass-panel-elevated">
+    <div class="camera-modal-header">
+      <h3>Camera Scan</h3>
+      <button type="button" class="camera-modal-close" id="close-camera-modal-btn">&times;</button>
+    </div>
+    
+    <div class="camera-viewfinder-container">
+      <div class="camera-spinner" id="camera-loading-spinner"></div>
+      <video id="camera-video" autoplay playsinline class="camera-video-feed"></video>
+      <div class="scan-overlay-guide"></div>
+    </div>
+    
+    <div class="camera-modal-controls">
+      <div class="camera-device-toggles">
+        <button type="button" class="camera-toggle-btn active" id="toggle-front-camera-btn">
+          👤 Front Camera
+        </button>
+        <button type="button" class="camera-toggle-btn" id="toggle-back-camera-btn">
+          🌳 Back Camera
+        </button>
+      </div>
+      
+      <div class="shutter-control-wrapper">
+        <button type="button" class="btn-shutter" id="capture-photo-btn" title="Capture Photo">
+          <div class="shutter-inner"></div>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Hidden Canvas for capture -->
+<canvas id="camera-canvas" style="display: none;"></canvas>
+
 <style>
-.loading-dots::after {
-  content: ' .';
-  animation: dots 1.5s steps(5, end) infinite;
-  display: inline-block;
-  width: 12px;
-  text-align: left;
+/* Container for inputs */
+.upload-inputs-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  align-items: center;
 }
-@keyframes dots {
-  0%, 20% { content: ' .'; }
-  40% { content: ' ..'; }
-  60% { content: ' ...'; }
-  80%, 100% { content: ''; }
+
+@media (min-width: 600px) {
+  .upload-inputs-group {
+    flex-direction: row;
+  }
+}
+
+.file-input-wrapper {
+  flex: 1;
+  width: 100%;
+}
+
+.or-divider {
+  font-weight: 600;
+  color: var(--muted);
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.btn-camera-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 64px;
+  width: 100%;
+  padding: 0 24px;
+  border-radius: 12px;
+  background: var(--background);
+  border: 1px dashed var(--primary);
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+@media (min-width: 600px) {
+  .btn-camera-trigger {
+    width: auto;
+  }
+}
+
+.btn-camera-trigger:hover {
+  background: rgba(8, 127, 140, 0.06);
+  border-style: solid;
+  transform: translateY(-1px);
+}
+
+/* Camera Modal Overlay */
+.camera-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 32, 43, 0.85);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.25s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.camera-modal-content {
+  width: min(520px, 95vw);
+  max-height: 95vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.92); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.camera-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--card);
+}
+
+.camera-modal-header h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+.camera-modal-close {
+  background: transparent;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: var(--muted);
+  transition: color 0.2s, transform 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.camera-modal-close:hover {
+  color: var(--destructive);
+  transform: scale(1.1);
+}
+
+.camera-viewfinder-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4/3;
+  background: #000;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.camera-video-feed {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+/* Front camera is mirrored by default */
+.camera-video-feed.mirrored {
+  transform: scaleX(-1);
+}
+
+/* Scanner target guide overlay */
+.scan-overlay-guide {
+  position: absolute;
+  top: 15%;
+  bottom: 15%;
+  left: 20%;
+  right: 20%;
+  border: 2px dashed rgba(255, 255, 255, 0.4);
+  border-radius: 50% / 40%;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scan-overlay-guide::after {
+  content: 'Position skin area here';
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  font-family: inherit;
+  font-weight: 500;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+  margin-top: 60%;
+}
+
+.camera-spinner {
+  border: 3px solid rgba(255, 255, 255, 0.15);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  animation: spin 1s linear infinite;
+  position: absolute;
+  z-index: 10;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.camera-modal-controls {
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  background: var(--card);
+  border-top: 1px solid var(--border);
+}
+
+.camera-device-toggles {
+  display: flex;
+  background: rgba(8, 127, 140, 0.05);
+  padding: 4px;
+  border-radius: 999px;
+  border: 1px solid rgba(8, 127, 140, 0.1);
+  width: fit-content;
+}
+
+.camera-toggle-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: transparent;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.camera-toggle-btn.active {
+  background: var(--primary);
+  color: white !important;
+  box-shadow: 0 2px 8px rgba(8, 127, 140, 0.24);
+}
+
+.shutter-control-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.btn-shutter {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: white;
+  border: 5px solid var(--border);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  outline: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.btn-shutter:hover {
+  transform: scale(1.06);
+  border-color: var(--primary);
+}
+
+.btn-shutter:active {
+  transform: scale(0.92);
+}
+
+.shutter-inner {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--primary);
+  transition: background-color 0.2s;
+}
+
+.btn-shutter:hover .shutter-inner {
+  background: #066d78;
+}
+
+/* Loading overlay for submission screen */
+.analyzing-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: fadeIn 0.3s ease;
+}
+
+.analyzing-pulse-badge {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: #eaf6f8;
+  display: grid;
+  place-items: center;
+  margin-bottom: 24px;
+  box-shadow: 0 0 0 0px rgba(8, 127, 140, 0.3);
+  animation: pulse-ring-glow 1.8s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+}
+
+@keyframes pulse-ring-glow {
+  0% {
+    box-shadow: 0 0 0 0px rgba(8, 127, 140, 0.5);
+  }
+  100% {
+    box-shadow: 0 0 0 35px rgba(8, 127, 140, 0);
+  }
 }
 </style>
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.querySelector('form');
@@ -43,43 +386,216 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (!form || !fileInput || !submitBtn) return;
 
-  form.addEventListener('submit', async (e) => {
-    // If already successfully cloned, submit normally
+  // Camera Elements
+  const openCameraBtn = document.getElementById('open-camera-btn');
+  const cameraModal = document.getElementById('camera-modal');
+  const closeCameraModalBtn = document.getElementById('close-camera-modal-btn');
+  const cameraVideo = document.getElementById('camera-video');
+  const cameraLoadingSpinner = document.getElementById('camera-loading-spinner');
+  const capturePhotoBtn = document.getElementById('capture-photo-btn');
+  const cameraCanvas = document.getElementById('camera-canvas');
+  
+  const toggleFrontCameraBtn = document.getElementById('toggle-front-camera-btn');
+  const toggleBackCameraBtn = document.getElementById('toggle-back-camera-btn');
+  
+  let currentStream = null;
+  let currentFacingMode = "user"; // default to front (selfie)
+
+  // Open camera modal
+  openCameraBtn.addEventListener('click', () => {
+    cameraModal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    startCamera(currentFacingMode);
+  });
+  
+  // Close camera modal
+  function closeModal() {
+    stopCamera();
+    cameraModal.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+  
+  closeCameraModalBtn.addEventListener('click', closeModal);
+  cameraModal.addEventListener('click', (e) => {
+    if (e.target === cameraModal) {
+      closeModal();
+    }
+  });
+  
+  // Switch to Front Camera
+  toggleFrontCameraBtn.addEventListener('click', () => {
+    if (currentFacingMode !== "user") {
+      toggleFrontCameraBtn.classList.add('active');
+      toggleBackCameraBtn.classList.remove('active');
+      startCamera("user");
+    }
+  });
+  
+  // Switch to Back Camera
+  toggleBackCameraBtn.addEventListener('click', () => {
+    if (currentFacingMode !== "environment") {
+      toggleBackCameraBtn.classList.add('active');
+      toggleFrontCameraBtn.classList.remove('active');
+      startCamera("environment");
+    }
+  });
+  
+  // Start video stream
+  async function startCamera(facingMode) {
+    stopCamera();
+    currentFacingMode = facingMode;
+    cameraLoadingSpinner.style.display = 'block';
+    
+    // Apply mirroring style for front camera
+    if (facingMode === "user") {
+      cameraVideo.classList.add('mirrored');
+    } else {
+      cameraVideo.classList.remove('mirrored');
+    }
+    
+    const constraints = {
+      video: {
+        facingMode: facingMode,
+        width: { ideal: 1080 },
+        height: { ideal: 1080 }
+      },
+      audio: false
+    };
+    
+    try {
+      currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+      cameraVideo.srcObject = currentStream;
+      cameraVideo.onloadedmetadata = () => {
+        cameraLoadingSpinner.style.display = 'none';
+      };
+    } catch (err) {
+      console.warn("Could not start camera with facingMode:", facingMode, err);
+      // Fallback to any camera
+      try {
+        currentStream = await navigator.mediaDevices.getUserMedia({ video: true });
+        cameraVideo.srcObject = currentStream;
+        cameraVideo.onloadedmetadata = () => {
+          cameraLoadingSpinner.style.display = 'none';
+        };
+      } catch (fallbackErr) {
+        cameraLoadingSpinner.style.display = 'none';
+        alert("Camera access denied or unavailable: " + fallbackErr.message);
+        closeModal();
+      }
+    }
+  }
+  
+  function stopCamera() {
+    if (currentStream) {
+      currentStream.getTracks().forEach(track => track.stop());
+      currentStream = null;
+    }
+    cameraVideo.srcObject = null;
+  }
+  
+  // Capture photo
+  capturePhotoBtn.addEventListener('click', () => {
+    if (!currentStream) return;
+    
+    const videoWidth = cameraVideo.videoWidth || 640;
+    const videoHeight = cameraVideo.videoHeight || 480;
+    cameraCanvas.width = videoWidth;
+    cameraCanvas.height = videoHeight;
+    
+    const ctx = cameraCanvas.getContext('2d');
+    
+    // If front camera, mirror capture
+    if (currentFacingMode === "user") {
+      ctx.translate(videoWidth, 0);
+      ctx.scale(-1, 1);
+    }
+    
+    ctx.drawImage(cameraVideo, 0, 0, videoWidth, videoHeight);
+    
+    cameraCanvas.toBlob((blob) => {
+      if (!blob) {
+        alert("Failed to capture image.");
+        return;
+      }
+      
+      const file = new File([blob], "camera_capture.jpg", { type: "image/jpeg" });
+      
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(file);
+      fileInput.files = dataTransfer.files;
+      
+      closeModal();
+      
+      // Auto-submit captured photo
+      triggerAutoSubmit();
+    }, "image/jpeg", 0.95);
+  });
+
+  // Auto-submit when file is selected via standard picker
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files.length > 0) {
+      triggerAutoSubmit();
+    }
+  });
+
+  // Handle standard submit button click (if any)
+  form.addEventListener('submit', (e) => {
     if (form.dataset.fileCloned === 'true') {
       return;
     }
+    e.preventDefault();
+    triggerAutoSubmit();
+  });
 
+  // Submit and show premium loading overlay
+  function triggerAutoSubmit() {
     const file = fileInput.files[0];
     if (!file) return;
 
-    e.preventDefault();
+    // Create and show analyzing overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'analyzing-overlay';
+    overlay.innerHTML = `
+      <div class="analyzing-pulse-badge">
+        <img src="/static/assets/favicon-v2.png" style="width:74px; height:74px;" alt="Scanning">
+      </div>
+      <h2 style="margin: 0; font-size: 24px; color: var(--foreground); font-family: 'Space Grotesk', sans-serif;">Analyzing Skin Image</h2>
+      <p class="muted" id="analyzing-status-text" style="margin-top: 10px; font-size:16px;">Scanning image...</p>
+    `;
+    document.body.appendChild(overlay);
+    
+    const statuses = [
+      "Uploading image...",
+      "Analyzing skin tone...",
+      "Checking image quality...",
+      "Detecting dermatological features...",
+      "Running AI neural network...",
+      "Calculating confidence scores..."
+    ];
+    let statusIdx = 0;
+    const statusInterval = setInterval(() => {
+      statusIdx = (statusIdx + 1) % statuses.length;
+      const el = document.getElementById('analyzing-status-text');
+      if (el) el.textContent = statuses[statusIdx];
+    }, 1000);
 
-    // Visual feedback
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '<span class="loading-dots">Preparing image</span>';
-
-    try {
-      // Read the file content into an ArrayBuffer
-      const arrayBuffer = await file.arrayBuffer();
-
-      // Create a fresh File object in memory. This breaks the volatile Android system URI reference.
-      const clonedFile = new File([arrayBuffer], file.name, { type: file.type });
-
-      // Assign the cloned file using DataTransfer API
-      const dataTransfer = new DataTransfer();
-      dataTransfer.items.add(clonedFile);
-      fileInput.files = dataTransfer.files;
-
-      form.dataset.fileCloned = 'true';
-      submitBtn.innerHTML = 'Uploading...';
-      form.submit();
-    } catch (error) {
-      console.error('File cloning failed:', error);
-      // Fallback: submit the original form if anything fails
-      form.dataset.fileCloned = 'true';
-      form.submit();
-    }
-  });
+    setTimeout(async () => {
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const clonedFile = new File([arrayBuffer], file.name, { type: file.type });
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(clonedFile);
+        fileInput.files = dataTransfer.files;
+        
+        form.dataset.fileCloned = 'true';
+        form.submit();
+      } catch (error) {
+        console.error('File cloning failed:', error);
+        form.dataset.fileCloned = 'true';
+        form.submit();
+      }
+    }, 300);
+  }
 });
 </script>
 {% endblock %}
