@@ -629,13 +629,25 @@ def dashboard():
         
         # Immediately run AI prediction and set session variables
         model_label, confidence = predict_image(filepath)
-        concern = model_label.lower()
+        label_lower = model_label.lower()
+        
+        if label_lower == "acne":
+            concern = "acne"
+        elif label_lower in ("melasma", "vitiligo"):
+            concern = "pigmentation"
+        elif label_lower in ("eczema", "psoriasis", "rosacea"):
+            concern = "acne_marks"
+        elif label_lower == "healthy":
+            concern = "open_pores"  # default profile for healthy / general care
+        else:
+            concern = "acne"
+            
         session["concern"] = concern
         
         if concern == "acne":
             session["skin_type"] = "oily"
             session["texture"] = "uneven"
-        elif concern in ("eczema", "psoriasis"):
+        elif concern in ("eczema", "psoriasis", "acne_marks"):
             session["skin_type"] = "sensitive"
             session["texture"] = "dry"
         elif concern == "rosacea":
